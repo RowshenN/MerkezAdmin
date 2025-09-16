@@ -18,7 +18,7 @@ const Banner = () => {
   const path = useLocation();
 
   const [filter, setFilter] = useState({
-    type: path?.pathname.includes("/banner") ? "banner" : "",
+    type: "",
     order: 1,
     deleted: false,
     name: "",
@@ -26,16 +26,10 @@ const Banner = () => {
     limit: 10,
   });
 
-  const { data: rawBanners = [], isLoading } = useGetAllBannersQuery({
-    type: filter.type,
-    order: filter.order,
-    deleted: filter.deleted,
-    name: filter.name,
-  });
+  const { data: rawBanners = [], isLoading } = useGetAllBannersQuery(filter);
 
   const banners = Array.isArray(rawBanners) ? [...rawBanners].reverse() : [];
 
-  console.log("databanner: ", banners);
   const [destroyBanner] = useDestroyBannerMutation();
 
   const [isDelete, setIsDelete] = useState(false);
@@ -129,9 +123,11 @@ const Banner = () => {
             >
               <div className="w-[10%] min-w-[60px] flex justify-start">
                 <img
-                  src={process.env.REACT_APP_BASE_URL + item?.img}
-                  alt=""
-                  className="w-[40px] h-[40px] rounded-[4px]"
+                  src={`${
+                    process.env.REACT_APP_BASE_URL
+                  }uploads/banner/${item?.img.split("\\").pop()}`}
+                  alt={item?.Imgs?.[0]?.name || "work image"}
+                  className="object-cover w-[40px] h-[40px] rounded-[4px]"
                 />
               </div>
 

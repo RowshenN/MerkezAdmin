@@ -29,7 +29,7 @@ const Admins = () => {
   const [search, setSearch] = useState("");
 
   const {
-    data: admins,
+    data: rawAdmins,
     error,
     isLoading,
   } = useGetAllAdminsQuery({
@@ -38,6 +38,8 @@ const Admins = () => {
     deleted: false,
   });
 
+  const admins = Array.isArray(rawAdmins) ? [...rawAdmins].reverse() : [];
+
   const [deleteAdmin] = useDestroyAdminMutation();
 
   useEffect(() => {
@@ -45,8 +47,6 @@ const Admins = () => {
       setUsers(admins);
     }
   }, [admins]);
-
-  console.log("admins:  ", admins);
 
   useEffect(() => {
     const time = setTimeout(() => {

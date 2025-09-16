@@ -17,12 +17,19 @@ import {
 const News = () => {
   const path = useLocation();
   const history = useHistory();
-  const [filter, setFilter] = useState({ search_query: "", sort: "default" });
+  const [filter, setFilter] = useState({
+    order: 1,
+    deleted: false,
+    name: "",
+    page: 1,
+    limit: 10,
+  });
   const [isDelete, setISDelete] = useState(false);
   const [identifier, setIdentifier] = useState(null);
 
-  const { data: rawNews = [], isLoading, refetch } = useGetAllNewsQuery();
+  const { data: rawNews = [], isLoading, refetch } = useGetAllNewsQuery(filter);
   const news = Array.isArray(rawNews) ? [...rawNews].reverse() : [];
+  console.log("news :  ", news);
   const [destroyNews] = useDestroyNewsMutation();
 
   const handleDestroy = async () => {
@@ -47,8 +54,8 @@ const News = () => {
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
-            onChange={(e, value) => setFilter({ ...filter, sort: value })}
-            value={filter.sort}
+            onChange={(e, value) => setFilter({ ...filter, order: value })}
+            value={filter.order}
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
             indicator={<KeyboardArrowDown className="!text-[16px]" />}
             sx={{
@@ -78,6 +85,16 @@ const News = () => {
 
       {/* Table */}
       <div className="w-full p-5 bg-white rounded-[8px]">
+        {/* Search */}
+        <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
+          <input
+            type="text"
+            placeholder="Gözleg"
+            value={filter.name}
+            onChange={(e) => setFilter({ ...filter, name: e.target.value })}
+            className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
+          />
+        </div>
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px]">
@@ -102,8 +119,15 @@ const News = () => {
               <div className="w-[8%] min-w-[45px]">
                 <h1 className="rounded-[4px] flex items-center justify-center w-[40px] h-[40px] bg-[#F7F8FA]">
                   <img
-                    src={process.env.REACT_APP_BASE_URL + item?.img?.img_url}
-                    alt=""
+                    src={
+                      item?.Imgs?.[0]?.src
+                        ? `${
+                            process.env.REACT_APP_BASE_URL
+                          }uploads/news/${item.Imgs[0].src.split("\\").pop()}`
+                        : "/placeholder.png"
+                    }
+                    alt={item?.Imgs?.[0]?.name || "work image"}
+                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
                   />
                 </h1>
               </div>

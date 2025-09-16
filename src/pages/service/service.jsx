@@ -10,38 +10,52 @@ import Pagination from "../../components/pagination";
 import PageLoading from "../../components/PageLoading";
 import {
   useGetAllServicesQuery,
-  useDeleteServiceMutation,
+  useDestroyServiceMutation,
 } from "../../services/service";
-
-import trash from "../../images/Trash.svg";
+import { BASE_URL } from "../../utils/axiosIntance";
 
 const Service = () => {
   const path = useLocation();
   const history = useHistory();
 
-  const [pages, setPages] = useState([]); // if backend supports meta later
+  const [pages, setPages] = useState([]);
   const [isDelete, setISDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [filter, setFilter] = useState({
     limit: 10,
     page: 1,
-    search_query: "",
+    name: "",
     sort: "default",
   });
 
-  // ✅ RTK Query
-  const { data: services = [], isLoading, refetch } = useGetAllServicesQuery();
+  const {
+    data: rawServices = [],
+    isLoading,
+    refetch,
+  } = useGetAllServicesQuery(filter);
 
-  const [deleteService, { isLoading: deleting }] = useDeleteServiceMutation();
+  const services = Array.isArray(rawServices) ? [...rawServices].reverse() : [];
+
+  const [destroyService, { isLoading: deleting }] = useDestroyServiceMutation();
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   const handleDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteService(deleteId).unwrap();
+      await destroyService(deleteId).unwrap();
       setISDelete(false);
       setDeleteId(null);
-      refetch(); // refresh list after deletion
+      refetch(); // refresh after deletion
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error(err);
     }
   };
 
@@ -49,9 +63,9 @@ const Service = () => {
 
   return (
     <div className="w-full">
-      {/* header section */}
+      {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Serwis</h1>
+        <h1 className="text-[30px] font-[700]">Hyzmatlar</h1>
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
@@ -84,41 +98,11 @@ const Service = () => {
 
       {/* Table */}
       <div className="w-full p-5 bg-white rounded-[8px]">
-        {/* Table search */}
+        {/* Search */}
         <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clipPath="url(#clip0_0_1937)">
-              <circle
-                cx="7.66683"
-                cy="7.66659"
-                r="6.33333"
-                stroke="#C7CED9"
-                strokeWidth="2"
-              />
-              <path
-                d="M12.3335 12.3333L14.6668 14.6666"
-                stroke="#C7CED9"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </g>
-            <defs>
-              <clipPath id="clip0_0_1937">
-                <rect width="16" height="16" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
           <input
-            value={filter.search_query}
-            onChange={(e) =>
-              setFilter({ ...filter, search_query: e.target.value })
-            }
+            value={filter.name}
+            onChange={(e) => setFilter({ ...filter, name: e.target.value })}
             type="text"
             className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
             placeholder="Gözleg"
@@ -128,92 +112,129 @@ const Service = () => {
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
-            Surat
+            Media
           </h1>
           <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
             Ady
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] whitespace-nowrap uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[47%] whitespace-nowrap uppercase">
             Text
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[15%] text-center uppercase">
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[8%] text-center uppercase">
+            Senesi
+          </h1>
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
             Status
           </h1>
         </div>
 
         {/* Table body */}
-        {services &&
-          services?.map((item, i) => (
-            <div
-              key={"services" + i}
-              className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
-            >
-              <div className="w-[8%] min-w-[45px]">
-                <h1 className="rounded-[4px] flex items-center justify-center w-[40px] h-[40px] bg-[#F7F8FA]">
+        {services?.map((item, i) => (
+          <div
+            key={"services" + i}
+            className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
+          >
+            <div className="w-[8%] min-w-[45px] flex gap-1">
+              <div className="relative w-[40px] h-[40px]">
+                {item?.Imgs?.length > 0 ? (
                   <img
-                    src={
-                      item.Img?.[0]?.url
-                        ? process.env.REACT_APP_BASE_URL + item.Img[0].url
-                        : ""
-                    }
-                    alt=""
+                    src={`${BASE_URL}uploads/service/${item.Imgs[0].src
+                      .split("\\")
+                      .pop()}`}
+                    alt={item?.Imgs[0]?.name || "service image"}
+                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
                   />
-                </h1>
+                ) : item?.Videos?.length > 0 ? (
+                  <video
+                    src={`${BASE_URL}uploads/service/${item.Videos[0].src
+                      .split("\\")
+                      .pop()}`}
+                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                    controls={false}
+                  />
+                ) : (
+                  <img
+                    src="/placeholder.png"
+                    alt="placeholder"
+                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                  />
+                )}
+
+                {/* Optional: show 'Video' badge if video exists and no image */}
+                {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
+                  <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
+                    Video
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <h1 className="text-[14px] font-[500] text-black w-[25%] ">
+              {item.name_tm}
+            </h1>
+
+            <h1 className="text-[14px] font-[500] text-black w-[45%] ">
+              {item.text_tm}
+            </h1>
+
+            <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
+              {formatDate(item.date)}
+            </h1>
+
+            <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
+              <div
+                className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
+                  item?.deleted
+                    ? "text-[#E9B500] bg-[#E9B500]"
+                    : "text-[#44CE62] bg-[#44CE62]"
+                }`}
+              >
+                {item?.deleted ? "Deleted" : "Active"}
               </div>
 
-              <h1 className="text-[14px] font-[500] text-black w-[25%] uppercase">
-                {item.name_tm}
-              </h1>
-
-              <h1 className="text-[14px] font-[500] text-black w-[20%] uppercase">
-                {item.text_tm}
-              </h1>
-
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
-                <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    item.is_active
-                      ? "text-[#44CE62] px-[26px] bg-[#44CE62]"
-                      : "text-[#E9B500] bg-[#E9B500]"
-                  }`}
+              <div
+                onClick={() =>
+                  history.push({ pathname: path?.pathname + "/" + item?.id })
+                }
+                className="cursor-pointer p-2"
+              >
+                <svg
+                  width="3"
+                  height="15"
+                  viewBox="0 0 3 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {item.is_active ? "Active" : "Garaşylýar"}
-                </div>
+                  <circle cx="1.5" cy="1.5" r="1.5" fill="black" />
+                  <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
+                  <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
+                </svg>
+              </div>
 
-                <div
-                  onClick={() =>
-                    history.push({ pathname: path?.pathname + "/" + item?.id })
-                  }
-                  className="cursor-pointer p-2"
+              <div
+                onClick={() => {
+                  setISDelete(true);
+                  setDeleteId(item.id);
+                }}
+                className="cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="red"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
                 >
-                  <svg
-                    width="3"
-                    height="15"
-                    viewBox="0 0 3 15"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="1.5" cy="1.5" r="1.5" fill="black" />
-                    <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
-                    <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
-                  </svg>
-                </div>
+                  <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
+                  <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
+                </svg>
+              </div>
+            </h1>
+          </div>
+        ))}
 
-                <div
-                  onClick={() => {
-                    setDeleteId(item.id);
-                    setISDelete(true);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <img src={trash} alt="trash" />
-                </div>
-              </h1>
-            </div>
-          ))}
-
-        {/* Table footer / Pagination */}
-        <div className="sticky bottom-0 bg-white h-fit py-1">
+        {/* Pagination */}
+        <div className="sticky mt-5 bottom-0 bg-white h-fit py-1">
           <Pagination
             meta={null}
             pages={pages}

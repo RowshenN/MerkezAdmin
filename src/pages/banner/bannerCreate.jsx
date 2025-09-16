@@ -88,8 +88,12 @@ const BannerCreate = () => {
       </div>
 
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
+        <div className=" flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
+          <div className="border-l-[3px] border-blue h-[20px]"></div>
+          <h1 className="text-[20px] font-[500]">Banner maglumaty</h1>
+        </div>
         {/* Banner Images */}
-        <div className="w-[49%]">
+        <div className="w-[49%] pt-4 mb-4 ">
           <h1 className="text-[16px] font-[500]">Banner suratlary</h1>
           <div className="flex gap-5 mt-5 justify-start">
             <input
@@ -116,9 +120,9 @@ const BannerCreate = () => {
             ) : (
               <div
                 onClick={() => fileRef.current.click()}
-                className="border-[2px] cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                className="border-[2px] w-full cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
               >
-                <span>Upload Image</span>
+                <span>Surat ýükle</span>
               </div>
             )}
           </div>
@@ -126,55 +130,67 @@ const BannerCreate = () => {
 
         {/* Banner Texts */}
         <div className="flex flex-col gap-5 items-start justify-between py-[15px]">
-          {["tm", "en", "ru"].map((lang) => (
-            <div key={lang} className="w-full flex flex-col gap-4">
+          <div className="w-full flex items-start justify-center gap-5 ">
+            <div className="w-full flex flex-col gap-4">
+              {["tm", "en", "ru"].map((lang) => (
+                <div key={lang} className="w-full">
+                  <h1 className="text-[16px] font-[500]">Ady_{lang}</h1>
+                  <input
+                    type="text"
+                    placeholder="Girizilmedik"
+                    value={banner[`title_${lang}`]}
+                    onChange={(e) =>
+                      setBanner({
+                        ...banner,
+                        [`title_${lang}`]: e.target.value,
+                      })
+                    }
+                    className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                  />
+                </div>
+              ))}
               <div className="w-full">
-                <h1 className="text-[16px] font-[500]">Ady_{lang}</h1>
+                <h1 className="text-[16px] font-[500]">Link</h1>
                 <input
                   type="text"
-                  placeholder="Girizilmedik"
-                  value={banner[`title_${lang}`]}
+                  placeholder="Banner link"
+                  value={banner.link}
                   onChange={(e) =>
-                    setBanner({ ...banner, [`title_${lang}`]: e.target.value })
+                    setBanner({ ...banner, link: e.target.value })
                   }
                   className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
                 />
               </div>
 
               <div className="w-full">
-                <h1 className="text-[16px] font-[500]">Text_{lang}</h1>
-                <textarea
-                  placeholder={`Text_${lang}`}
-                  value={banner[`text_${lang}`]}
+                <h1 className="text-[16px] font-[500]">Type</h1>
+                <input
+                  type="text"
+                  placeholder="Banner type"
+                  value={banner.type}
                   onChange={(e) =>
-                    setBanner({ ...banner, [`text_${lang}`]: e.target.value })
+                    setBanner({ ...banner, type: e.target.value })
                   }
                   className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
                 />
               </div>
             </div>
-          ))}
 
-          <div className="w-full">
-            <h1 className="text-[16px] font-[500]">Link</h1>
-            <input
-              type="text"
-              placeholder="Banner link"
-              value={banner.link}
-              onChange={(e) => setBanner({ ...banner, link: e.target.value })}
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-          </div>
-
-          <div className="w-full">
-            <h1 className="text-[16px] font-[500]">Type</h1>
-            <input
-              type="text"
-              placeholder="Banner type"
-              value={banner.type}
-              onChange={(e) => setBanner({ ...banner, type: e.target.value })}
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col gap-4">
+              {["tm", "en", "ru"].map((lang) => (
+                <div key={lang} className="w-full">
+                  <h1 className="text-[16px] font-[500]">Text_{lang}</h1>
+                  <textarea
+                    placeholder={`Text_${lang}`}
+                    value={banner[`text_${lang}`]}
+                    onChange={(e) =>
+                      setBanner({ ...banner, [`text_${lang}`]: e.target.value })
+                    }
+                    className="text-[14px] min-h-[100px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

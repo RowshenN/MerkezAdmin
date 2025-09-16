@@ -18,7 +18,10 @@ export const serviceApi = createApi({
   endpoints: (builder) => ({
     // 1. Get all services
     getAllServices: builder.query({
-      query: () => `api/service/all`,
+      query: (params) => {
+        const query = new URLSearchParams(params).toString();
+        return `api/service/all?${query}`;
+      },
       providesTags: ["Service"],
     }),
 

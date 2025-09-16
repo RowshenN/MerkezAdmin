@@ -15,9 +15,12 @@ const WorksCreate = () => {
   const [createWork, { isLoading }] = useCreateWorkMutation();
 
   const [file, setFile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
   const [bigPostPicture, setBigPostPicture] = useState(null);
   const [warning, setWarning] = useState(false);
+
   const fileRef = useRef(null);
+  const videoRef = useRef(null);
 
   const [work, setWork] = useState({
     name_tm: "",
@@ -26,6 +29,7 @@ const WorksCreate = () => {
     text_tm: "",
     text_ru: "",
     text_en: "",
+    date: "",
   });
 
   const handleSubmit = async () => {
@@ -48,7 +52,9 @@ const WorksCreate = () => {
     formData.append("text_tm", work.text_tm);
     formData.append("text_ru", work.text_ru);
     formData.append("text_en", work.text_en);
+    formData.append("date", work.date);
     if (file) formData.append("img", file);
+    if (videoFile) formData.append("video", videoFile);
 
     try {
       await createWork(formData).unwrap();
@@ -93,20 +99,20 @@ const WorksCreate = () => {
 
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Işler</h1>
+        <h1 className="text-[30px] font-[700]">Edilen iş döretmek</h1>
       </div>
 
       {/* Form */}
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
         <div className="flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
           <div className="border-l-[3px] border-blue h-[20px]"></div>
-          <h1 className="text-[20px] font-[500]">Işler maglumaty</h1>
+          <h1 className="text-[20px] font-[500]">Edilen işiň maglumaty</h1>
         </div>
 
         {/* Image Upload */}
         <div className="flex items-center object-contain justify-between py-[30px]">
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Işler suratlary</h1>
+            <h1 className="text-[16px] font-[500]">Surat</h1>
             <div className="flex gap-5 mt-5 justify-start">
               <input
                 onChange={(e) => setFile(e.target.files[0])}
@@ -131,9 +137,40 @@ const WorksCreate = () => {
               ) : (
                 <div
                   onClick={() => fileRef.current.click()}
-                  className="border-[2px] cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                  className="border-[2px] cursor-pointer w-full border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
                 >
                   + Surat goş
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Video Upload */}
+          <div className="w-[49%]">
+            <h1 className="text-[16px] font-[500]">Wideo</h1>
+            <div className="flex gap-5 mt-5 justify-start">
+              <input
+                onChange={(e) => setVideoFile(e.target.files[0])}
+                ref={videoRef}
+                className="hidden"
+                type="file"
+              />
+              {videoFile ? (
+                <div className="p-2 border rounded cursor-pointer relative">
+                  <div
+                    onClick={() => setVideoFile(null)}
+                    className="absolute -top-2 -right-2 bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    X
+                  </div>
+                  <p>{videoFile.name}</p>
+                </div>
+              ) : (
+                <div
+                  onClick={() => videoRef.current.click()}
+                  className="border-[2px] cursor-pointer w-full border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                >
+                  + Wideo goş
                 </div>
               )}
             </div>
@@ -143,45 +180,77 @@ const WorksCreate = () => {
         {/* Input fields */}
         <div className="flex items-start justify-between py-[15px]">
           <div className="w-[49%] flex flex-col items-start justify-start gap-4">
-            <input
-              value={work.name_tm}
-              onChange={(e) => setWork({ ...work, name_tm: e.target.value })}
-              placeholder="Ady_tm"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={work.name_en}
-              onChange={(e) => setWork({ ...work, name_en: e.target.value })}
-              placeholder="Ady_en"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={work.name_ru}
-              onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
-              placeholder="Ady_ru"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (türkmen dilinde)</h1>
+              <input
+                value={work.name_tm}
+                onChange={(e) => setWork({ ...work, name_tm: e.target.value })}
+                placeholder="Ady_tm"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (iňlis dilinde)</h1>
+              <input
+                value={work.name_en}
+                onChange={(e) => setWork({ ...work, name_en: e.target.value })}
+                placeholder="Ady_en"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (rus dilinde)</h1>
+              <input
+                value={work.name_ru}
+                onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
+                placeholder="Ady_ru"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Edilen işiň senesi</h1>
+              <input
+                value={work.date}
+                onChange={(e) => setWork({ ...work, date: e.target.value })}
+                type="date"
+                className="border-[1px] w-full border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
 
           <div className="w-[49%] flex flex-col items-baseline justify-start gap-4">
-            <textarea
-              value={work.text_tm}
-              onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
-              placeholder="Text_tm"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={work.text_en}
-              onChange={(e) => setWork({ ...work, text_en: e.target.value })}
-              placeholder="Text_en"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={work.text_ru}
-              onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
-              placeholder="Text_ru"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (türkmen dilinde)</h1>
+              <textarea
+                value={work.text_tm}
+                onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
+                placeholder="Text_tm"
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (iňlis dilinde)</h1>
+              <textarea
+                value={work.text_en}
+                onChange={(e) => setWork({ ...work, text_en: e.target.value })}
+                placeholder="Text_en"
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (rus dilinde)</h1>
+              <textarea
+                value={work.text_ru}
+                onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
+                placeholder="Text_ru"
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
         </div>
       </div>

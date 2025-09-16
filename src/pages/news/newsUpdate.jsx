@@ -28,8 +28,10 @@ const NewsUpdate = () => {
     text_ru: "",
     text_en: "",
     img: null,
+    date: "",
   });
-  const [file, setFile] = useState(null);
+  const [oldImg, setOldImg] = useState(null); // old image from backend
+  const [file, setFile] = useState(null); // new uploaded file
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -37,13 +39,32 @@ const NewsUpdate = () => {
   const [updateNews] = useUpdateNewsMutation();
   const [destroyNews] = useDestroyNewsMutation();
 
+  // Load news data
   useEffect(() => {
-    if (data) setNews(data); // backend returns news object directly
+    if (data) {
+      setNews(data);
+      setOldImg(data.Imgs?.[0] || null);
+    }
   }, [data]);
 
   if (isLoading) return <PageLoading />;
   if (error) return <div>Ýalňyşlyk boldy</div>;
 
+  // Handle new file selection
+  const handleFileChange = (f) => {
+    const type = f.type?.split("/")[1];
+    if (
+      (type === "png" || type === "jpg" || type === "jpeg") &&
+      f.size <= 1024 * 1000
+    ) {
+      setFile(f);
+      setOldImg(null); // remove old image visually
+    } else {
+      message.warning("Faýl görnüşi ýa-da ölçegi nädogry!");
+    }
+  };
+
+  // Handle update
   const handleUpdate = async () => {
     if (
       !news.name_tm ||
@@ -58,18 +79,24 @@ const NewsUpdate = () => {
     }
 
     const formData = new FormData();
-    formData.append("id", id); // backend needs id in body for update
+    formData.append("id", id);
     formData.append("name_tm", news.name_tm);
     formData.append("name_ru", news.name_ru);
     formData.append("name_en", news.name_en);
     formData.append("text_tm", news.text_tm);
     formData.append("text_ru", news.text_ru);
     formData.append("text_en", news.text_en);
+    formData.append("date", news.date || "");
+
+    // Send kept old image ID if not removed
+    if (oldImg) formData.append("keptImgIds", JSON.stringify([oldImg.id]));
+
+    // Append new uploaded file
     if (file) formData.append("img", file);
 
     setLoading(true);
     try {
-      await updateNews({ id, formData }).unwrap();
+      await updateNews(formData).unwrap();
       message.success("Täzelik üstünlikli üýtgedildi");
       history.goBack();
     } catch (err) {
@@ -77,18 +104,6 @@ const NewsUpdate = () => {
       message.warning("Üýtgetmek başartmady!");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFileChange = (f) => {
-    const type = f.type?.split("/")[1];
-    if (
-      (type === "png" || type === "jpg" || type === "jpeg") &&
-      f.size <= 1024 * 1000 // up to 1MB
-    ) {
-      setFile(f);
-    } else {
-      message.warning("Faýl görnüşi ýa-da ölçegi nädogry!");
     }
   };
 
@@ -142,6 +157,7 @@ const NewsUpdate = () => {
               className="hidden"
               onChange={(e) => handleFileChange(e.target.files[0])}
             />
+
             {file ? (
               <div className="relative w-[75px] h-[75px]">
                 <div
@@ -153,13 +169,29 @@ const NewsUpdate = () => {
                 <img
                   src={URL.createObjectURL(file)}
                   className="w-[75px] h-[75px] object-cover rounded-[6px]"
-                  alt="News"
+                  alt="New upload"
+                />
+              </div>
+            ) : oldImg ? (
+              <div className="relative w-[75px] h-[75px]">
+                <div
+                  onClick={() => setOldImg(null)}
+                  className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                >
+                  ✕
+                </div>
+                <img
+                  src={`${
+                    process.env.REACT_APP_BASE_URL
+                  }uploads/news/${oldImg.src.split("\\").pop()}`}
+                  className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                  alt="Old news"
                 />
               </div>
             ) : (
               <div
                 onClick={() => fileRef.current.click()}
-                className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
               >
                 <span>+ Surat goş</span>
               </div>
@@ -170,44 +202,66 @@ const NewsUpdate = () => {
         {/* News Text */}
         <div className="flex items-start justify-between py-[15px] gap-5">
           <div className="w-[49%] flex flex-col gap-4">
-            <input
-              value={news.name_tm}
-              onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
-              placeholder="Ady_tm"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={news.name_en}
-              onChange={(e) => setNews({ ...news, name_en: e.target.value })}
-              placeholder="Ady_en"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={news.name_ru}
-              onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
-              placeholder="Ady_ru"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (türkmen dilinde)</h1>
+              <input
+                value={news.name_tm}
+                onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
+                placeholder="Ady_tm"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (iňlis dilinde)</h1>
+              <input
+                value={news.name_en}
+                onChange={(e) => setNews({ ...news, name_en: e.target.value })}
+                placeholder="Ady_en"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (rus dilinde)</h1>
+              <input
+                value={news.name_ru}
+                onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
+                placeholder="Ady_ru"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
           <div className="w-[49%] flex flex-col gap-4">
-            <textarea
-              value={news.text_tm}
-              onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
-              placeholder="Text_tm"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={news.text_en}
-              onChange={(e) => setNews({ ...news, text_en: e.target.value })}
-              placeholder="Text_en"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={news.text_ru}
-              onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
-              placeholder="Text_ru"
-              className="border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (türkmen dilinde)</h1>
+              <textarea
+                value={news.text_tm}
+                onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
+                placeholder="Text_tm"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (iňlis dilinde)</h1>
+              <textarea
+                value={news.text_en}
+                onChange={(e) => setNews({ ...news, text_en: e.target.value })}
+                placeholder="Text_en"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (rus dilinde)</h1>
+              <textarea
+                value={news.text_ru}
+                onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
+                placeholder="Text_ru"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
         </div>
 

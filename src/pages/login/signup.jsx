@@ -12,7 +12,7 @@ const SignUp = () => {
 
   const [user, setUser] = useState({
     name: "",
-    lastname: "",
+    lastName: "",
     phone: "",
     password: "",
   });
@@ -70,8 +70,8 @@ const SignUp = () => {
               Ulanyjy familýasy
             </label>
             <input
-              value={user.lastname}
-              onChange={(e) => setUser({ ...user, lastname: e.target.value })}
+              value={user.lastName}
+              onChange={(e) => setUser({ ...user, lastName: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && sign()}
               id="lastname"
               className="px-4 text-black text-[16px] font-[400] h-[50px] w-[400px] rounded-[6px] border border-[#98A2B2] outline-none"

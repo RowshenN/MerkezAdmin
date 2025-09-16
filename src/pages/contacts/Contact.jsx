@@ -35,7 +35,7 @@ const Contact = () => {
 
   // RTK Query hooks
   const {
-    data: contactsData,
+    data: rawContactsData,
     isLoading,
     refetch,
   } = useGetAllContactsQuery({
@@ -44,7 +44,9 @@ const Contact = () => {
     limit: filter.limit,
   });
 
-  // console.log("contacts:  ", con);
+  const contactsData = Array.isArray(rawContactsData)
+    ? [...rawContactsData].reverse()
+    : [];
 
   const [deleteContact] = useDeleteContactMutation();
 

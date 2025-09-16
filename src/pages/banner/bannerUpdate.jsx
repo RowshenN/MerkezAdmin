@@ -30,21 +30,21 @@ const BannerUpdate = () => {
   const [destroyBanner] = useDestroyBannerMutation();
 
   const [banner, setBanner] = useState(null);
-  const [file, setFile] = useState(null);
+  const [oldImg, setOldImg] = useState(null); // old image from backend
+  const [file, setFile] = useState(null); // new uploaded file
   const [bigPostPicture, setBigPostPicture] = useState(null);
   const [warning, setWarning] = useState(false);
 
-  // Fix: set banner directly from API
   useEffect(() => {
     if (bannerData) {
       setBanner(bannerData);
+      setOldImg(bannerData.img ? { src: bannerData.img } : null);
     }
   }, [bannerData]);
 
   if (isLoading || !banner) return <PageLoading />;
   if (error) return <div>Ýalňyşlyk boldy</div>;
 
-  // Update Banner
   const handleUpdateBanner = async () => {
     if (!banner.title_tm || !banner.title_en || !banner.title_ru) {
       setWarning(true);
@@ -57,6 +57,10 @@ const BannerUpdate = () => {
         formData.append(key, value ?? "")
       );
 
+      // Keep old image if not removed
+      if (oldImg) formData.append("keptImg", oldImg.src);
+
+      // Append new uploaded image
       if (file) formData.append("img", file);
 
       await updateBanner(formData).unwrap();
@@ -68,7 +72,6 @@ const BannerUpdate = () => {
     }
   };
 
-  // Delete Banner
   const handleDeleteBanner = async () => {
     try {
       await destroyBanner(banner.id).unwrap();
@@ -114,6 +117,10 @@ const BannerUpdate = () => {
 
       {/* Banner Form */}
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px] flex flex-col gap-5">
+        <div className=" flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
+          <div className="border-l-[3px] border-blue h-[20px]"></div>
+          <h1 className="text-[20px] font-[500]">Banner maglumaty</h1>
+        </div>
         {/* Banner Image */}
         <div className="w-[49%]">
           <h1 className="text-[16px] font-[500]">Banner suratlary</h1>
@@ -126,6 +133,7 @@ const BannerUpdate = () => {
                 if (e.target.files[0]) {
                   setFile(e.target.files[0]);
                   setBigPostPicture(URL.createObjectURL(e.target.files[0]));
+                  setOldImg(null); // remove old image visually
                 }
               }}
             />
@@ -144,19 +152,18 @@ const BannerUpdate = () => {
                   className="w-[75px] h-[75px] object-cover rounded-[6px]"
                 />
               </div>
-            ) : banner.img ? (
+            ) : oldImg ? (
               <div className="w-[75px] h-[75px] relative cursor-pointer border-[#98A2B2] rounded-[6px]">
                 <div
-                  onClick={() => setBanner({ ...banner, img: null })}
+                  onClick={() => setOldImg(null)}
                   className="absolute -top-[20px] -right-[20px] w-[30px] h-[30px] p-[1px] rounded-full border-2 bg-gray-100 flex items-center justify-center"
                 >
                   <CloseRoundedIcon className="w-[16px] h-[16px]" />
                 </div>
                 <img
-                  src={`http://localhost:8080/${banner.img.replace(
-                    /\\/g,
-                    "/"
-                  )}`}
+                  src={`${
+                    process.env.REACT_APP_BASE_URL
+                  }uploads/banner/${oldImg.src.split("\\").pop()}`}
                   alt="banner"
                   className="w-[75px] h-[75px] object-cover rounded-[6px]"
                 />
@@ -164,65 +171,77 @@ const BannerUpdate = () => {
             ) : (
               <div
                 onClick={() => fileRef.current.click()}
-                className="border-2 border-dashed border-[#98A2B2] p-[25px] rounded-[6px] cursor-pointer"
+                className="border-2 w-full border-dashed border-[#98A2B2] p-[25px] rounded-[6px] cursor-pointer"
               >
-                <span>Upload Image</span>
+                <span>Surat ýükle</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Banner Texts */}
-        <div className="flex flex-col gap-4">
-          {["tm", "en", "ru"].map((lang) => (
-            <div key={lang} className="flex flex-col gap-2">
-              <div>
-                <h1 className="text-[16px] font-[500]">Banner_{lang} ady</h1>
+        <div className="flex flex-col gap-5 items-start justify-between py-[15px]">
+          <div className="w-full flex items-start justify-center gap-5 ">
+            <div className="w-full flex flex-col gap-4">
+              {["tm", "en", "ru"].map((lang) => (
+                <div key={lang} className="w-full">
+                  <h1 className="text-[16px] font-[500]">Ady_{lang}</h1>
+                  <input
+                    type="text"
+                    placeholder="Girizilmedik"
+                    value={banner[`title_${lang}`]}
+                    onChange={(e) =>
+                      setBanner({
+                        ...banner,
+                        [`title_${lang}`]: e.target.value,
+                      })
+                    }
+                    className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                  />
+                </div>
+              ))}
+              <div className="w-full">
+                <h1 className="text-[16px] font-[500]">Link</h1>
                 <input
                   type="text"
-                  placeholder="Girizilmedik"
-                  value={banner[`title_${lang}`] || ""}
+                  placeholder="Banner link"
+                  value={banner.link}
                   onChange={(e) =>
-                    setBanner({ ...banner, [`title_${lang}`]: e.target.value })
+                    setBanner({ ...banner, link: e.target.value })
                   }
-                  className="w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none text-[14px]"
+                  className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
                 />
               </div>
 
-              <div>
-                <h1 className="text-[16px] font-[500]">Text_{lang}</h1>
-                <textarea
-                  placeholder={`Text_${lang}`}
-                  value={banner[`text_${lang}`] || ""}
+              <div className="w-full">
+                <h1 className="text-[16px] font-[500]">Type</h1>
+                <input
+                  type="text"
+                  placeholder="Banner type"
+                  value={banner.type}
                   onChange={(e) =>
-                    setBanner({ ...banner, [`text_${lang}`]: e.target.value })
+                    setBanner({ ...banner, type: e.target.value })
                   }
-                  className="w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none text-[14px]"
+                  className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
                 />
               </div>
             </div>
-          ))}
 
-          <div>
-            <h1 className="text-[16px] font-[500]">Link</h1>
-            <input
-              type="text"
-              placeholder="Banner link"
-              value={banner.link || ""}
-              onChange={(e) => setBanner({ ...banner, link: e.target.value })}
-              className="w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none text-[14px]"
-            />
-          </div>
-
-          <div>
-            <h1 className="text-[16px] font-[500]">Type</h1>
-            <input
-              type="text"
-              placeholder="Banner type"
-              value={banner.type || ""}
-              onChange={(e) => setBanner({ ...banner, type: e.target.value })}
-              className="w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none text-[14px]"
-            />
+            <div className="w-full flex flex-col gap-4">
+              {["tm", "en", "ru"].map((lang) => (
+                <div key={lang} className="w-full">
+                  <h1 className="text-[16px] font-[500]">Text_{lang}</h1>
+                  <textarea
+                    placeholder={`Text_${lang}`}
+                    value={banner[`text_${lang}`]}
+                    onChange={(e) =>
+                      setBanner({ ...banner, [`text_${lang}`]: e.target.value })
+                    }
+                    className="text-[14px] min-h-[100px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

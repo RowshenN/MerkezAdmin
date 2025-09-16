@@ -21,8 +21,10 @@ const About = () => {
     limit: 10,
   });
 
-  const { data: abouts = [], isLoading } = useGetAllAboutsQuery(filter);
+  const { data: rawAbouts = [], isLoading } = useGetAllAboutsQuery(filter);
   const [destroyAbout] = useDestroyAboutMutation();
+
+  const abouts = Array.isArray(rawAbouts) ? [...rawAbouts].reverse() : [];
 
   // state for modal
   const [isDelete, setIsDelete] = useState(false);

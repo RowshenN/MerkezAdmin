@@ -21,13 +21,8 @@ export const bannerApi = createApi({
     // Get all banners
     getAllBanners: builder.query({
       query: (params) => {
-        const query = new URLSearchParams({
-          type: params.type || "",
-          order: params.order || 1,
-          deleted: params.deleted || false,
-          name: params.name || "",
-        }).toString();
-        return `api/banner/all`;
+        const query = new URLSearchParams(params).toString();
+        return `api/banner/all?${query}`;
       },
       providesTags: ["Banner"],
     }),

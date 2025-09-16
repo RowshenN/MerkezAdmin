@@ -17,7 +17,10 @@ export const worksApi = createApi({
   endpoints: (builder) => ({
     // Get all works
     getAllWorks: builder.query({
-      query: () => "api/works/all",
+      query: (params) => {
+        const query = new URLSearchParams(params).toString();
+        return `api/works/all?${query}`;
+      },
       providesTags: ["Works"],
     }),
 
@@ -46,7 +49,6 @@ export const worksApi = createApi({
       }),
       invalidatesTags: ["Works"],
     }),
-
     // Soft delete a work
     deleteWork: builder.mutation({
       query: (id) => ({

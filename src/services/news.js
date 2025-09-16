@@ -18,7 +18,10 @@ export const newsApi = createApi({
   endpoints: (builder) => ({
     // 1. Get all news
     getAllNews: builder.query({
-      query: () => `api/news/all`,
+      query: (params) => {
+        const query = new URLSearchParams(params).toString();
+        return `api/news/all?${query}`;
+      },
       providesTags: ["News"],
     }),
 
@@ -40,8 +43,8 @@ export const newsApi = createApi({
 
     // 4. Update news
     updateNews: builder.mutation({
-      query: ({ id, formData }) => ({
-        url: `api/news/update`, // backend does not need ID in path
+      query: (formData) => ({
+        url: `api/news/update`,
         method: "PATCH",
         body: formData,
       }),

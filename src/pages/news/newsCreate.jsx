@@ -101,8 +101,12 @@ const NewsCreate = () => {
 
       {/* Form */}
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
+        <div className="flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
+          <div className="border-l-[3px] border-blue h-[20px]"></div>
+          <h1 className="text-[20px] font-[500]">Täzeligiň maglumaty</h1>
+        </div>
         {/* Image Upload */}
-        <div className="flex items-center object-contain justify-between py-[30px]">
+        <div className="flex items-center object-contain pt-5  justify-between">
           <div className="w-[49%]">
             <h1 className="text-[16px] font-[500]">Täzelik suratlary</h1>
             <div className="flex gap-5 mt-5 justify-start">
@@ -129,7 +133,7 @@ const NewsCreate = () => {
               ) : (
                 <div
                   onClick={() => fileRef.current.click()}
-                  className="border-[2px] cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                  className="border-[2px] w-full cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
                 >
                   + Surat goş
                 </div>
@@ -139,47 +143,69 @@ const NewsCreate = () => {
         </div>
 
         {/* Input fields */}
-        <div className="flex items-start justify-between py-[15px]">
+        <div className="flex items-start justify-between pt-7">
           <div className="w-[49%] flex flex-col items-start justify-start gap-4">
-            <input
-              value={news.name_tm}
-              onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
-              placeholder="Ady_tm"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={news.name_en}
-              onChange={(e) => setNews({ ...news, name_en: e.target.value })}
-              placeholder="Ady_en"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <input
-              value={news.name_ru}
-              onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
-              placeholder="Ady_ru"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (türkmen dilinde)</h1>
+              <input
+                value={news.name_tm}
+                onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
+                placeholder="Ady_tm"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (iňlis dilinde)</h1>
+              <input
+                value={news.name_en}
+                onChange={(e) => setNews({ ...news, name_en: e.target.value })}
+                placeholder="Ady_en"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (rus dilinde)</h1>
+              <input
+                value={news.name_ru}
+                onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
+                placeholder="Ady_ru"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
 
           <div className="w-[49%] flex flex-col items-baseline justify-start gap-4">
-            <textarea
-              value={news.text_tm}
-              onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
-              placeholder="Text_tm"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={news.text_en}
-              onChange={(e) => setNews({ ...news, text_en: e.target.value })}
-              placeholder="Text_en"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
-            <textarea
-              value={news.text_ru}
-              onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
-              placeholder="Text_ru"
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-            />
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (türkmen dilinde)</h1>
+              <textarea
+                value={news.text_tm}
+                onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
+                placeholder="Text_tm"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (iňlis dilinde)</h1>
+              <textarea
+                value={news.text_en}
+                onChange={(e) => setNews({ ...news, text_en: e.target.value })}
+                placeholder="Text_en"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Beýany (rus dilinde)</h1>
+              <textarea
+                value={news.text_ru}
+                onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
+                placeholder="Text_ru"
+                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
           </div>
         </div>
       </div>
