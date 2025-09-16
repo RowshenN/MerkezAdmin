@@ -74,7 +74,7 @@ const AboutCreate = () => {
         ].map((field) => (
           <div
             key={field.key}
-            className="flex items-center border-t-[1px] justify-between py-[30px]"
+            className="flex items-center  border-t-[1px] justify-between py-[30px]"
           >
             <div className="w-[380px]">
               <h1 className="text-[18px] font-[500]">{field.label}</h1>

@@ -119,7 +119,7 @@ const BannerUpdate = () => {
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px] flex flex-col gap-5">
         <div className=" flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
           <div className="border-l-[3px] border-blue h-[20px]"></div>
-          <h1 className="text-[20px] font-[500]">Banner maglumaty</h1>
+          <h1 className="text-[20px] font-[500] ">Banner maglumaty</h1>
         </div>
         {/* Banner Image */}
         <div className="w-[49%]">
