@@ -18,18 +18,30 @@ const News = () => {
   const path = useLocation();
   const history = useHistory();
   const [filter, setFilter] = useState({
-    order: 1,
-    deleted: false,
     name: "",
-    page: 1,
-    limit: 10,
+    order: "default",
+    deleted: "false",
   });
   const [isDelete, setISDelete] = useState(false);
   const [identifier, setIdentifier] = useState(null);
 
-  const { data: rawNews = [], isLoading, refetch } = useGetAllNewsQuery(filter);
+  const mappedFilter = {
+    ...filter,
+    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    deleted:
+      filter.deleted === "true"
+        ? true
+        : filter.deleted === "false"
+        ? false
+        : "",
+  };
+
+  const {
+    data: rawNews = [],
+    isLoading,
+    refetch,
+  } = useGetAllNewsQuery(mappedFilter);
   const news = Array.isArray(rawNews) ? [...rawNews].reverse() : [];
-  console.log("news :  ", news);
   const [destroyNews] = useDestroyNewsMutation();
 
   const handleDestroy = async () => {
@@ -68,10 +80,27 @@ const News = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="caption">Adyna görä</Option>
-            <Option value="-caption">-Adyna görä</Option>
-            <Option value="created_at">Senesine görä</Option>
-            <Option value="-created_at">-Senesine görä</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
+          </Select>
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
+            value={filter.deleted}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="">Hemmesini görkez</Option>
+            <Option value="false">Aktiw</Option>
+            <Option value="true">Aktiw däl</Option>
           </Select>
           <Button
             onClick={() => history.push({ pathname: "/news/create" })}
@@ -97,14 +126,19 @@ const News = () => {
         </div>
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px]">
-            Surat
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
+            Media
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%]">Ady</h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[40%] whitespace-nowrap">
+          <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
+            Ady
+          </h1>
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[47%] whitespace-nowrap uppercase">
             Text
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[15%] text-center">
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[8%] text-center uppercase">
+            Senesi
+          </h1>
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
             Status
           </h1>
         </div>
@@ -116,20 +150,39 @@ const News = () => {
               key={"news" + i}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
-              <div className="w-[8%] min-w-[45px]">
-                <h1 className="rounded-[4px] flex items-center justify-center w-[40px] h-[40px] bg-[#F7F8FA]">
-                  <img
-                    src={
-                      item?.Imgs?.[0]?.src
-                        ? `${
-                            process.env.REACT_APP_BASE_URL
-                          }uploads/news/${item.Imgs[0].src.split("\\").pop()}`
-                        : "/placeholder.png"
-                    }
-                    alt={item?.Imgs?.[0]?.name || "work image"}
-                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                  />
-                </h1>
+              <div className="w-[8%] min-w-[45px] flex gap-1">
+                <div className="relative w-[40px] h-[40px]">
+                  {item?.Imgs?.length > 0 ? (
+                    <img
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }uploads/news/${item.Imgs[0].src.split("\\").pop()}`}
+                      alt={item?.Imgs[0]?.name || "news image"}
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                    />
+                  ) : item?.Videos?.length > 0 ? (
+                    <video
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }uploads/news/${item.Videos[0].src.split("\\").pop()}`}
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                      controls={false}
+                    />
+                  ) : (
+                    <img
+                      src="/placeholder.png"
+                      alt="placeholder"
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                    />
+                  )}
+
+                  {/* Badge for video if no image */}
+                  {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
+                    <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
+                      Video
+                    </span>
+                  )}
+                </div>
               </div>
 
               <h1 className="text-[14px] font-[500] text-black w-[25%]">
@@ -139,15 +192,21 @@ const News = () => {
                 {item?.text_tm}
               </h1>
 
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%]">
+              <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
+                {item?.date
+                  ? new Date(item.date).toLocaleDateString("en-GB")
+                  : "-"}
+              </h1>
+
+              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
                 <div
                   className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    item?.is_active
-                      ? "text-[#44CE62] px-[26px] bg-[#44CE62]"
-                      : "text-[#E9B500] bg-[#E9B500]"
+                    item?.deleted
+                      ? "text-[#E9B500] bg-[#E9B500]"
+                      : "text-[#44CE62] bg-[#44CE62]"
                   }`}
                 >
-                  {item?.is_active ? "Active" : "Garaşylýar"}
+                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
                 </div>
 
                 <div
@@ -174,9 +233,8 @@ const News = () => {
                     setISDelete(true);
                     setIdentifier(item.id);
                   }}
-                  className="cursor-pointer w-full h-full"
+                  className="cursor-pointer"
                 >
-                  {/* Pretty red trash SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="red"

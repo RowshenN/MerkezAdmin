@@ -22,17 +22,27 @@ const Service = () => {
   const [isDelete, setISDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [filter, setFilter] = useState({
-    limit: 10,
-    page: 1,
     name: "",
-    sort: "default",
+    order: "default",
+    deleted: "false",
   });
+
+  const mappedFilter = {
+    ...filter,
+    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    deleted:
+      filter.deleted === "true"
+        ? true
+        : filter.deleted === "false"
+        ? false
+        : "",
+  };
 
   const {
     data: rawServices = [],
     isLoading,
     refetch,
-  } = useGetAllServicesQuery(filter);
+  } = useGetAllServicesQuery(mappedFilter);
 
   const services = Array.isArray(rawServices) ? [...rawServices].reverse() : [];
 
@@ -53,7 +63,7 @@ const Service = () => {
       await destroyService(deleteId).unwrap();
       setISDelete(false);
       setDeleteId(null);
-      refetch(); // refresh after deletion
+      refetch();
     } catch (err) {
       console.error(err);
     }
@@ -69,8 +79,8 @@ const Service = () => {
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
-            onChange={(e, value) => setFilter({ ...filter, sort: value })}
-            value={filter.sort}
+            onChange={(e, value) => setFilter({ ...filter, order: value })}
+            value={filter.order}
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
             indicator={<KeyboardArrowDown className="!text-[16px]" />}
             sx={{
@@ -83,8 +93,27 @@ const Service = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="caption">Adyna görä</Option>
-            <Option value="-caption">-Adyna görä</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
+          </Select>
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
+            value={filter.deleted}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="">Hemmesini görkez</Option>
+            <Option value="false">Aktiw</Option>
+            <Option value="true">Aktiw däl</Option>
           </Select>
           <Button
             onClick={() => history.push({ pathname: "/service/create" })}
@@ -189,7 +218,7 @@ const Service = () => {
                     : "text-[#44CE62] bg-[#44CE62]"
                 }`}
               >
-                {item?.deleted ? "Deleted" : "Active"}
+                {item?.deleted ? "Aktiw däl" : "Aktiw"}
               </div>
 
               <div
@@ -261,7 +290,7 @@ const Service = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Haryt aýyrmak</h1>
+              <h1 className="text-[20px] font-[500]">Hyzmady aýyrmak</h1>
               <button onClick={() => setISDelete(false)}>
                 <svg
                   width="16"
@@ -281,7 +310,7 @@ const Service = () => {
             </div>
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Harydy aýyrmak isleýärsiňizmi?
+                Hyzmady aýyrmak isleýärsiňizmi?
               </h1>
               <div className="flex gap-[29px] justify-center">
                 <button

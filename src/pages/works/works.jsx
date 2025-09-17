@@ -23,17 +23,27 @@ const Works = () => {
   const [isDelete, setISDelete] = useState(false);
   const [isId, setIsId] = useState(null);
   const [filter, setFilter] = useState({
-    limit: 10,
-    page: 1,
     name: "",
-    sort: "default",
+    order: "default",
+    deleted: "false",
   });
+
+  const mappedFilter = {
+    ...filter,
+    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    deleted:
+      filter.deleted === "true"
+        ? true
+        : filter.deleted === "false"
+        ? false
+        : "",
+  };
 
   const {
     data: worksData,
     isLoading,
     refetch,
-  } = useGetAllWorksQuery(filter, {
+  } = useGetAllWorksQuery(mappedFilter, {
     refetchOnMountOrArgChange: true,
   });
 
@@ -70,7 +80,7 @@ const Works = () => {
       setISDelete(false);
       setSelecteds([]);
       setAllSelected(false);
-      refetch(); // ensure table updates after delete
+      refetch();
     } catch (err) {
       console.error(err);
     }
@@ -86,8 +96,8 @@ const Works = () => {
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
-            onChange={(e, value) => setFilter({ ...filter, sort: value })}
-            value={filter.sort}
+            onChange={(e, value) => setFilter({ ...filter, order: value })}
+            value={filter.order}
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
             indicator={<KeyboardArrowDown className="!text-[16px]" />}
             sx={{
@@ -100,10 +110,27 @@ const Works = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä</Option>
-            <Option value="desc">-Adyna görä</Option>
-            <Option value="date">Senesine görä</Option>
-            <Option value="-date">-Senesine görä</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
+          </Select>
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
+            value={filter.deleted}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="">Hemmesini görkez</Option>
+            <Option value="false">Aktiw</Option>
+            <Option value="true">Aktiw däl</Option>
           </Select>
           <Button
             onClick={() => history.push({ pathname: "/works/create" })}
@@ -203,13 +230,13 @@ const Works = () => {
 
               <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[13%] uppercase">
                 <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
+                  className={`bg-opacity-15 whitespace-nowrap px-4 py-2 w-fit rounded-[12px] ${
                     item?.deleted
                       ? "text-[#E9B500] bg-[#E9B500]"
                       : "text-[#44CE62] bg-[#44CE62]"
                   }`}
                 >
-                  {item?.deleted ? "Deleted" : "Active"}
+                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
                 </div>
 
                 <div

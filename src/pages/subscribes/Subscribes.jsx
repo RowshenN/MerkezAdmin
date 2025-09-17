@@ -45,7 +45,6 @@ const Contact = () => {
 
   const [emailRecipient, setEmailRecipient] = useState("");
 
-  // RTK Query: Get subscribes
   const {
     data: rawContactsData,
     isLoading,
@@ -60,7 +59,6 @@ const Contact = () => {
   const [sendToPerson] = useSendToPersonMutation();
   const [sendToPeople] = useSendToPeopleMutation();
 
-  // Handle search debounce
   useEffect(() => {
     const time = setTimeout(() => {
       setFilter({ ...filter, search: search });
@@ -111,13 +109,12 @@ const Contact = () => {
     }
   };
 
-  // Optional: handle pagination if needed
-  useEffect(() => {
-    if (contactsData?.length) {
-      const totalPages = Math.ceil(contactsData.length / filter.limit);
-      setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
-    }
-  }, [contactsData, filter.limit]);
+  // useEffect(() => {
+  //   if (contactsData?.length) {
+  //     const totalPages = Math.ceil(contactsData.length / filter.limit);
+  //     setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
+  //   }
+  // }, [contactsData, filter.limit]);
 
   if (isLoading) return <PageLoading />;
 
@@ -125,9 +122,9 @@ const Contact = () => {
     <div className="w-full">
       {/* header section */}
       <div className="w-full pb-[15px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Subscribe</h1>
+        <h1 className="text-[30px] font-[700]">Yzarlaýanlar</h1>
         <div className="w-fit flex gap-5">
-          <Select
+          {/* <Select
             onChange={(e, value) => setFilter({ ...filter, type: value })}
             placeholder="Hemmesini görkez"
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
@@ -161,14 +158,14 @@ const Contact = () => {
                 });
             }}
             format={"DD-MM-YYYY"}
-          />
+          /> */}
 
           {/* Send to All Button */}
           <Button
             onClick={() => setIsSendAllModal(true)}
             className="!h-[40px] !bg-green-600 !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
           >
-            Send to All
+            Ählisine ugrat
           </Button>
         </div>
       </div>
@@ -189,10 +186,13 @@ const Contact = () => {
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
-            Name
+            Ady
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[35%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[60%] uppercase">
             E-mail
+          </h1>
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[15%] uppercase">
+            Hereketler
           </h1>
         </div>
 
@@ -211,8 +211,8 @@ const Contact = () => {
                 {item?.email}
               </h1>
 
-              <h1 className="text-[14px] flex items-center justify-center gap-5 font-[500] text-[#98A2B2] w-[20%] ">
-                <div
+              <h1 className="text-[14px] flex items-center justify-center gap-5 font-[500] text-[#98A2B2] w-[25%] ">
+                {/* <div
                   // onClick={() =>
                   //   history.push({ pathname: "/contact/" + item?.id })
                   // }
@@ -229,7 +229,7 @@ const Contact = () => {
                     <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
                     <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
                   </svg>
-                </div>
+                </div> */}
 
                 {/* Send to person */}
                 <div
@@ -278,7 +278,7 @@ const Contact = () => {
         {/* Table footer */}
         <div className="w-full bg-white p-4 rounded-[8px] flex mt-5 justify-between items-center">
           <h1 className="text-[14px] font-[400]">
-            {contactsData?.length} Subscribers
+            {contactsData?.length} Yzarlaýanlar
           </h1>
           <Pagination
             meta={contactsData}
@@ -308,7 +308,7 @@ const Contact = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Subscribe aýyrmak</h1>
+              <h1 className="text-[20px] font-[500]">Yzarlaýany aýyrmak</h1>
               <button onClick={() => setISDelete(false)}>
                 <svg
                   width="16"
@@ -329,7 +329,7 @@ const Contact = () => {
 
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Subscribe aýyrmak isleýärsiňizmi?
+                Yzarlaýany aýyrmak isleýärsiňizmi?
               </h1>
 
               <div className="flex gap-[29px] justify-center">
@@ -364,7 +364,7 @@ const Contact = () => {
             variant="outlined"
             sx={{ maxWidth: 700, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
-            <h1 className="text-[20px] font-[500] mb-4">Send to Person</h1>
+            <h1 className="text-[20px] font-[500] mb-4">Yzarlaýana ugratmak</h1>
 
             {/* Autofilled Email Field */}
             <input
@@ -393,13 +393,13 @@ const Contact = () => {
                 onClick={() => setIsSendPersonModal(false)}
                 className="px-6 py-2 rounded border"
               >
-                Cancel
+                Goýbolsun et
               </button>
               <button
                 onClick={handleSendPerson}
                 className="px-6 py-2 rounded bg-blue text-white"
               >
-                Send
+                Ugrat
               </button>
             </div>
           </Sheet>
@@ -419,7 +419,7 @@ const Contact = () => {
             variant="outlined"
             sx={{ maxWidth: 700, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
-            <h1 className="text-[20px] font-[500] mb-4">Send to All</h1>
+            <h1 className="text-[20px] font-[500] mb-4">Ählisine ugrat</h1>
             <input
               type="text"
               placeholder="Subject"
@@ -439,13 +439,13 @@ const Contact = () => {
                 onClick={() => setIsSendAllModal(false)}
                 className="px-6 py-2 rounded border"
               >
-                Cancel
+                Goýbolsun et
               </button>
               <button
                 onClick={handleSendAll}
                 className="px-6 py-2 rounded bg-blue text-white"
               >
-                Send
+                Ugrat
               </button>
             </div>
           </Sheet>

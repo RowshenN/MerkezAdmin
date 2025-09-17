@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Button from "@mui/joy/Button";
 import Modal from "@mui/joy/Modal";
 import Sheet from "@mui/joy/Sheet";
-import { Add } from "@mui/icons-material";
-import { useHistory } from "react-router-dom";
+import Select, { selectClasses } from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
+import { KeyboardArrowDown, Add } from "@mui/icons-material";
+import { useHistory, useLocation } from "react-router-dom";
 import PageLoading from "../../components/PageLoading";
 import Pagination from "../../components/pagination";
 import {
@@ -15,13 +17,25 @@ const About = () => {
   const history = useHistory();
   const [filter, setFilter] = useState({
     name: "",
-    order: 1,
-    deleted: false,
-    page: 1,
-    limit: 10,
+    order: "default",
+    deleted: "false",
   });
 
-  const { data: rawAbouts = [], isLoading } = useGetAllAboutsQuery(filter);
+  const path = useLocation();
+
+  const mappedFilter = {
+    ...filter,
+    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    deleted:
+      filter.deleted === "true"
+        ? true
+        : filter.deleted === "false"
+        ? false
+        : "",
+  };
+
+  const { data: rawAbouts = [], isLoading } =
+    useGetAllAboutsQuery(mappedFilter);
   const [destroyAbout] = useDestroyAboutMutation();
 
   const abouts = Array.isArray(rawAbouts) ? [...rawAbouts].reverse() : [];
@@ -44,6 +58,44 @@ const About = () => {
       <div className="w-full pb-[30px] flex justify-between items-center">
         <h1 className="text-[30px] font-[700]">Biz barada</h1>
         <div className="w-fit flex gap-5">
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, order: value })}
+            value={filter.order}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="default">Hemmesini görkez</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
+          </Select>
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
+            value={filter.deleted}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="">Hemmesini görkez</Option>
+            <Option value="false">Aktiw</Option>
+            <Option value="true">Aktiw däl</Option>
+          </Select>
           <Button
             onClick={() => history.push("/about/create")}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
@@ -69,14 +121,14 @@ const About = () => {
 
         {/* Table Header */}
         <div className="w-full gap-[30px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[35%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[32%] uppercase">
             Header
           </h1>
           <h1 className="text-[14px] font-[500]  text-[#98A2B2] w-[55%] min-w-[120px] whitespace-nowrap uppercase">
             Text
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[10%] uppercase">
-            Action
+            STATUS
           </h1>
         </div>
 
@@ -95,10 +147,21 @@ const About = () => {
               <h1 className="text-[14px]  font-[500] text-black w-[55%] min-w-[120px]">
                 {item?.text_tm}
               </h1>
-              <div className="flex gap-3 items-center w-[10%]">
-                {/* 3 dots */}
+              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
                 <div
-                  onClick={() => history.push("/about/" + item?.id)}
+                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
+                    item?.deleted
+                      ? "text-[#E9B500] bg-[#E9B500]"
+                      : "text-[#44CE62] bg-[#44CE62]"
+                  }`}
+                >
+                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
+                </div>
+
+                <div
+                  onClick={() =>
+                    history.push({ pathname: path?.pathname + "/" + item?.id })
+                  }
                   className="cursor-pointer p-2"
                 >
                   <svg
@@ -114,13 +177,12 @@ const About = () => {
                   </svg>
                 </div>
 
-                {/* Red Trash */}
-                <button
+                <div
                   onClick={() => {
-                    setSelectedId(item.id);
                     setIsDelete(true);
+                    setSelectedId(item.id);
                   }}
-                  className="cursor-pointer p-2"
+                  className="cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -132,8 +194,8 @@ const About = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </button>
-              </div>
+                </div>
+              </h1>
             </div>
           ))
         )}

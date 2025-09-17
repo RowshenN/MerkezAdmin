@@ -18,7 +18,8 @@ import {
 const NewsUpdate = () => {
   const history = useHistory();
   const { id } = useParams();
-  const fileRef = useRef(null);
+  const imgRef = useRef(null);
+  const videoRef = useRef(null);
 
   const [news, setNews] = useState({
     name_tm: "",
@@ -27,11 +28,11 @@ const NewsUpdate = () => {
     text_tm: "",
     text_ru: "",
     text_en: "",
-    img: null,
     date: "",
   });
-  const [oldImg, setOldImg] = useState(null); // old image from backend
-  const [file, setFile] = useState(null); // new uploaded file
+
+  const [imgFiles, setImgFiles] = useState([]); // old + new images
+  const [videoFile, setVideoFile] = useState(null); // only 1 video
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -42,27 +43,22 @@ const NewsUpdate = () => {
   // Load news data
   useEffect(() => {
     if (data) {
-      setNews(data);
-      setOldImg(data.Imgs?.[0] || null);
+      setNews({
+        name_tm: data.name_tm || "",
+        name_ru: data.name_ru || "",
+        name_en: data.name_en || "",
+        text_tm: data.text_tm || "",
+        text_ru: data.text_ru || "",
+        text_en: data.text_en || "",
+        date: data.date ? data.date.slice(0, 10) : "",
+      });
+      setImgFiles(data.Imgs || []);
+      setVideoFile(data.Videos?.[0] || null);
     }
   }, [data]);
 
   if (isLoading) return <PageLoading />;
   if (error) return <div>Ýalňyşlyk boldy</div>;
-
-  // Handle new file selection
-  const handleFileChange = (f) => {
-    const type = f.type?.split("/")[1];
-    if (
-      (type === "png" || type === "jpg" || type === "jpeg") &&
-      f.size <= 1024 * 1000
-    ) {
-      setFile(f);
-      setOldImg(null); // remove old image visually
-    } else {
-      message.warning("Faýl görnüşi ýa-da ölçegi nädogry!");
-    }
-  };
 
   // Handle update
   const handleUpdate = async () => {
@@ -88,11 +84,22 @@ const NewsUpdate = () => {
     formData.append("text_en", news.text_en);
     formData.append("date", news.date || "");
 
-    // Send kept old image ID if not removed
-    if (oldImg) formData.append("keptImgIds", JSON.stringify([oldImg.id]));
+    // Append new images
+    imgFiles.forEach((file) => {
+      if (file instanceof File) formData.append("img", file);
+    });
 
-    // Append new uploaded file
-    if (file) formData.append("img", file);
+    // Append video if it's a new file
+    if (videoFile instanceof File) formData.append("video", videoFile);
+
+    // Send IDs of old images/videos to keep
+    const keptImgIds = imgFiles
+      .filter((f) => !(f instanceof File))
+      .map((f) => f.id);
+    const keptVideoIds =
+      videoFile && !(videoFile instanceof File) ? [videoFile.id] : [];
+    formData.append("keptImgIds", JSON.stringify(keptImgIds));
+    formData.append("keptVideoIds", JSON.stringify(keptVideoIds));
 
     setLoading(true);
     try {
@@ -144,58 +151,99 @@ const NewsUpdate = () => {
       </div>
 
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
-        {/* News Image */}
+        {/* Media Upload */}
         <div className="flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
           <div className="border-l-[3px] border-blue h-[20px]"></div>
-          <h1 className="text-[20px] font-[500]">Täzelik suratlary</h1>
+          <h1 className="text-[20px] font-[500]">Täzelik media</h1>
         </div>
-        <div className="flex items-center object-contain justify-between py-[30px]">
+        <div className="flex items-start justify-between py-[30px] gap-4">
+          {/* Images */}
           <div className="w-[49%]">
-            <input
-              ref={fileRef}
-              type="file"
-              className="hidden"
-              onChange={(e) => handleFileChange(e.target.files[0])}
-            />
+            <h1 className="text-[16px] font-[500]">Suratlar</h1>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {imgFiles.map((file, index) => (
+                <div key={index} className="relative w-[75px] h-[75px]">
+                  <img
+                    src={
+                      file instanceof File
+                        ? URL.createObjectURL(file)
+                        : file.src
+                        ? `${
+                            process.env.REACT_APP_BASE_URL
+                          }uploads/news/${file.src.split("\\").pop()}`
+                        : ""
+                    }
+                    className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                  />
+                  <div
+                    onClick={() =>
+                      setImgFiles(imgFiles.filter((_, i) => i !== index))
+                    }
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    ✕
+                  </div>
+                </div>
+              ))}
 
-            {file ? (
-              <div className="relative w-[75px] h-[75px]">
-                <div
-                  onClick={() => setFile(null)}
-                  className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
-                >
-                  ✕
-                </div>
-                <img
-                  src={URL.createObjectURL(file)}
-                  className="w-[75px] h-[75px] object-cover rounded-[6px]"
-                  alt="New upload"
-                />
-              </div>
-            ) : oldImg ? (
-              <div className="relative w-[75px] h-[75px]">
-                <div
-                  onClick={() => setOldImg(null)}
-                  className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
-                >
-                  ✕
-                </div>
-                <img
-                  src={`${
-                    process.env.REACT_APP_BASE_URL
-                  }uploads/news/${oldImg.src.split("\\").pop()}`}
-                  className="w-[75px] h-[75px] object-cover rounded-[6px]"
-                  alt="Old news"
-                />
-              </div>
-            ) : (
               <div
-                onClick={() => fileRef.current.click()}
-                className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                onClick={() => imgRef.current.click()}
+                className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
               >
-                <span>+ Surat goş</span>
+                + Surat goş
               </div>
-            )}
+              <input
+                ref={imgRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setImgFiles([...imgFiles, e.target.files[0]])}
+              />
+            </div>
+          </div>
+
+          {/* Video */}
+          <div className="w-[49%]">
+            <h1 className="text-[16px] font-[500]">Wideo</h1>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {videoFile && (
+                <div className="relative w-[75px] h-[75px]">
+                  <video
+                    src={
+                      videoFile instanceof File
+                        ? URL.createObjectURL(videoFile)
+                        : videoFile.src
+                        ? `${
+                            process.env.REACT_APP_BASE_URL
+                          }uploads/news/${videoFile.src.split("\\").pop()}`
+                        : ""
+                    }
+                    className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                    controls
+                  />
+                  <div
+                    onClick={() => setVideoFile(null)}
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    ✕
+                  </div>
+                </div>
+              )}
+
+              {!videoFile && (
+                <div
+                  onClick={() => videoRef.current.click()}
+                  className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                >
+                  + Wideo goş
+                </div>
+              )}
+              <input
+                ref={videoRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setVideoFile(e.target.files[0])}
+              />
+            </div>
           </div>
         </div>
 
@@ -207,7 +255,7 @@ const NewsUpdate = () => {
               <input
                 value={news.name_tm}
                 onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
-                placeholder="Ady_tm"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -217,7 +265,7 @@ const NewsUpdate = () => {
               <input
                 value={news.name_en}
                 onChange={(e) => setNews({ ...news, name_en: e.target.value })}
-                placeholder="Ady_en"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -227,8 +275,18 @@ const NewsUpdate = () => {
               <input
                 value={news.name_ru}
                 onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
-                placeholder="Ady_ru"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Täzeligiň senesi</h1>
+              <input
+                value={news.date}
+                onChange={(e) => setNews({ ...news, date: e.target.value })}
+                type="date"
+                className="border-[1px] w-full border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>
@@ -238,8 +296,8 @@ const NewsUpdate = () => {
               <textarea
                 value={news.text_tm}
                 onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
-                placeholder="Text_tm"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
 
@@ -248,8 +306,8 @@ const NewsUpdate = () => {
               <textarea
                 value={news.text_en}
                 onChange={(e) => setNews({ ...news, text_en: e.target.value })}
-                placeholder="Text_en"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
 
@@ -258,8 +316,8 @@ const NewsUpdate = () => {
               <textarea
                 value={news.text_ru}
                 onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
-                placeholder="Text_ru"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>

@@ -42,11 +42,11 @@ const Admins = () => {
 
   const [deleteAdmin] = useDestroyAdminMutation();
 
-  useEffect(() => {
-    if (admins) {
-      setUsers(admins);
-    }
-  }, [admins]);
+  // useEffect(() => {
+  //   if (admins) {
+  //     setUsers(admins);
+  //   }
+  // }, [admins]);
 
   useEffect(() => {
     const time = setTimeout(() => {

@@ -6,7 +6,6 @@ import {
   News,
   NewsCreate,
   NewsUpdate,
-  Home,
   Login,
   Signup,
   Admins,
@@ -41,11 +40,10 @@ const App = () => {
       <ScrollIntoView>
         <Suspense fallback={<PageLoading />}>
           <Switch>
-            <PrivateRoute restricted={true} component={Home} path="/" exact />
             <PrivateRoute
               restricted={true}
-              component={Home}
-              path="/home"
+              component={Contact}
+              path="/"
               exact
             />
 
@@ -197,7 +195,7 @@ const App = () => {
 
             <Route path="/" exact component={Login} />
             <Route path="/login" exact component={Login} />
-            <Route path="/signup" exact component={Signup} />
+            {/* <Route path="/signup" exact component={Signup} /> */}
           </Switch>
         </Suspense>
       </ScrollIntoView>

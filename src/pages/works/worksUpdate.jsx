@@ -241,7 +241,7 @@ const WorksUpdate = () => {
               <input
                 value={work.name_tm}
                 onChange={(e) => setWork({ ...work, name_tm: e.target.value })}
-                placeholder="Ady_tm"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -251,7 +251,7 @@ const WorksUpdate = () => {
               <input
                 value={work.name_en}
                 onChange={(e) => setWork({ ...work, name_en: e.target.value })}
-                placeholder="Ady_en"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -261,7 +261,7 @@ const WorksUpdate = () => {
               <input
                 value={work.name_ru}
                 onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
-                placeholder="Ady_ru"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -282,7 +282,7 @@ const WorksUpdate = () => {
               <textarea
                 value={work.text_tm}
                 onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
-                placeholder="Text_tm"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -292,7 +292,7 @@ const WorksUpdate = () => {
               <textarea
                 value={work.text_en}
                 onChange={(e) => setWork({ ...work, text_en: e.target.value })}
-                placeholder="Text_en"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -302,7 +302,7 @@ const WorksUpdate = () => {
               <textarea
                 value={work.text_ru}
                 onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
-                placeholder="Text_ru"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>

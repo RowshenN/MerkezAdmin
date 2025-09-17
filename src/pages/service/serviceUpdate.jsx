@@ -246,7 +246,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, name_tm: e.target.value })
                 }
-                placeholder="Ady_tm"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -258,7 +258,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, name_en: e.target.value })
                 }
-                placeholder="Ady_en"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -270,7 +270,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, name_ru: e.target.value })
                 }
-                placeholder="Ady_ru"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -295,7 +295,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, text_tm: e.target.value })
                 }
-                placeholder="Text_tm"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -307,7 +307,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, text_en: e.target.value })
                 }
-                placeholder="Text_en"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -319,7 +319,7 @@ const ServiceUpdate = () => {
                 onChange={(e) =>
                   setProduct({ ...product, text_ru: e.target.value })
                 }
-                placeholder="Text_ru"
+                placeholder="Text..."
                 className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>

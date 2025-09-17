@@ -134,10 +134,18 @@ const BannerCreate = () => {
             <div className="w-full flex flex-col gap-4">
               {["tm", "en", "ru"].map((lang) => (
                 <div key={lang} className="w-full">
-                  <h1 className="text-[16px] font-[500]">Ady_{lang}</h1>
+                  <h1 className="text-[16px] font-[500]">
+                    Ady (
+                    {lang == "tm"
+                      ? "türkmen dilinde"
+                      : lang == "en"
+                      ? "iňlis dilinde"
+                      : "rus dilinde"}
+                    )
+                  </h1>
                   <input
                     type="text"
-                    placeholder="Girizilmedik"
+                    placeholder="Ady..."
                     value={banner[`title_${lang}`]}
                     onChange={(e) =>
                       setBanner({
@@ -150,10 +158,10 @@ const BannerCreate = () => {
                 </div>
               ))}
               <div className="w-full">
-                <h1 className="text-[16px] font-[500]">Link</h1>
+                <h1 className="text-[16px] font-[500]">Baglanyşygy</h1>
                 <input
                   type="text"
-                  placeholder="Banner link"
+                  placeholder="Baglanyşygy..."
                   value={banner.link}
                   onChange={(e) =>
                     setBanner({ ...banner, link: e.target.value })
@@ -163,10 +171,10 @@ const BannerCreate = () => {
               </div>
 
               <div className="w-full">
-                <h1 className="text-[16px] font-[500]">Type</h1>
+                <h1 className="text-[16px] font-[500]">Görnüşi</h1>
                 <input
                   type="text"
-                  placeholder="Banner type"
+                  placeholder="Görnüşi..."
                   value={banner.type}
                   onChange={(e) =>
                     setBanner({ ...banner, type: e.target.value })
@@ -179,9 +187,17 @@ const BannerCreate = () => {
             <div className="w-full flex flex-col gap-4">
               {["tm", "en", "ru"].map((lang) => (
                 <div key={lang} className="w-full">
-                  <h1 className="text-[16px] font-[500]">Text_{lang}</h1>
+                  <h1 className="text-[16px] font-[500]">
+                    Beýany (
+                    {lang == "tm"
+                      ? "türkmen dilinde"
+                      : lang == "en"
+                      ? "iňlis dilinde"
+                      : "rus dilinde"}
+                    )
+                  </h1>
                   <textarea
-                    placeholder={`Text_${lang}`}
+                    placeholder={`Text...`}
                     value={banner[`text_${lang}`]}
                     onChange={(e) =>
                       setBanner({ ...banner, [`text_${lang}`]: e.target.value })

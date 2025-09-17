@@ -18,15 +18,24 @@ const Banner = () => {
   const path = useLocation();
 
   const [filter, setFilter] = useState({
-    type: "",
-    order: 1,
-    deleted: false,
     name: "",
-    page: 1,
-    limit: 10,
+    order: "default",
+    deleted: "false",
   });
 
-  const { data: rawBanners = [], isLoading } = useGetAllBannersQuery(filter);
+  const mappedFilter = {
+    ...filter,
+    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    deleted:
+      filter.deleted === "true"
+        ? true
+        : filter.deleted === "false"
+        ? false
+        : "",
+  };
+
+  const { data: rawBanners = [], isLoading } =
+    useGetAllBannersQuery(mappedFilter);
 
   const banners = Array.isArray(rawBanners) ? [...rawBanners].reverse() : [];
 
@@ -51,10 +60,8 @@ const Banner = () => {
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, order: value })}
             value={filter.order}
-            onChange={(e, value) =>
-              setFilter({ ...filter, order: value === "ASC" ? 1 : 2 })
-            }
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
             indicator={<KeyboardArrowDown className="!text-[16px]" />}
             sx={{
@@ -66,8 +73,28 @@ const Banner = () => {
               },
             }}
           >
-            <Option value="ASC">Adyna görä ↑</Option>
-            <Option value="DESC">Adyna görä ↓</Option>
+            <Option value="default">Hemmesini görkez</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
+          </Select>
+          <Select
+            placeholder="Hemmesini görkez"
+            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
+            value={filter.deleted}
+            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
+            indicator={<KeyboardArrowDown className="!text-[16px]" />}
+            sx={{
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="">Hemmesini görkez</Option>
+            <Option value="false">Aktiw</Option>
+            <Option value="true">Aktiw däl</Option>
           </Select>
 
           <Button

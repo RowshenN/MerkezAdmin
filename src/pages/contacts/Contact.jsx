@@ -85,8 +85,8 @@ const Contact = () => {
     <div className="w-full">
       {/* header */}
       <div className="w-full pb-[15px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Contact</h1>
-        <div className="w-fit flex gap-5">
+        <h1 className="text-[30px] font-[700]">Habarlaşmak</h1>
+        {/* <div className="w-fit flex gap-5">
           <Select
             onChange={(e, value) => setFilter({ ...filter, type: value })}
             placeholder="Hemmesini görkez"
@@ -122,7 +122,7 @@ const Contact = () => {
             }}
             format="DD-MM-YYYY"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* table */}
@@ -141,13 +141,16 @@ const Contact = () => {
         {/* table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
-            Name
+            Ady
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[30%] uppercase">
             E-mail
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[55%] uppercase">
             Text
+          </h1>
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[5%] uppercase">
+            Hereket
           </h1>
         </div>
 
@@ -164,7 +167,7 @@ const Contact = () => {
               <h1 className="text-[14px] font-[500] text-black w-[30%]  ">
                 {item.email}
               </h1>
-              <h1 className="text-[14px] font-[500] text-black w-[50%]  ">
+              <h1 className="text-[14px] font-[500] text-black w-[60%]  ">
                 {item.text}
               </h1>
               <div

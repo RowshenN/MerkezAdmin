@@ -13,7 +13,11 @@ import { useCreateNewsMutation } from "../../services/news";
 
 const NewsCreate = () => {
   const history = useHistory();
-  const [file, setFile] = useState(null);
+  const imgRef = useRef(null);
+  const videoRef = useRef(null);
+
+  const [imgFile, setImgFile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
   const [bigPostPicture, setBigPostPicture] = useState(null);
   const fileRef = useRef(null);
   const [warning, setWarning] = useState(false);
@@ -24,20 +28,20 @@ const NewsCreate = () => {
     text_tm: "",
     text_ru: "",
     text_en: "",
-    date: new Date().toISOString().split("T")[0],
+    date: "",
   });
 
   const [createNews, { isLoading }] = useCreateNewsMutation();
 
   const handleSubmit = async () => {
-    // Validate
     if (
       !news.name_tm ||
       !news.name_ru ||
       !news.name_en ||
       !news.text_tm ||
       !news.text_ru ||
-      !news.text_en
+      !news.text_en ||
+      !news.date
     ) {
       setWarning(true);
       return;
@@ -51,7 +55,9 @@ const NewsCreate = () => {
     formData.append("text_ru", news.text_ru);
     formData.append("text_en", news.text_en);
     formData.append("date", news.date);
-    if (file) formData.append("img", file);
+
+    if (imgFile) formData.append("img", imgFile);
+    if (videoFile) formData.append("video", videoFile);
 
     try {
       await createNews(formData).unwrap();
@@ -105,39 +111,79 @@ const NewsCreate = () => {
           <div className="border-l-[3px] border-blue h-[20px]"></div>
           <h1 className="text-[20px] font-[500]">Täzeligiň maglumaty</h1>
         </div>
-        {/* Image Upload */}
-        <div className="flex items-center object-contain pt-5  justify-between">
+        {/* Image & Video Upload */}
+        <div className="flex items-start justify-between py-[30px] gap-4">
+          {/* Image Upload */}
           <div className="w-[49%]">
             <h1 className="text-[16px] font-[500]">Täzelik suratlary</h1>
-            <div className="flex gap-5 mt-5 justify-start">
-              <input
-                onChange={(e) => setFile(e.target.files[0])}
-                ref={fileRef}
-                className="hidden"
-                type="file"
-              />
-              {file ? (
-                <div className="w-[75px] h-[75px] p-0 cursor-pointer border-[#98A2B2] rounded-[6px] relative">
-                  <div
-                    onClick={() => setFile(null)}
-                    className="bg-gray-100 text-[8px] w-[30px] h-[30px] border-2 rounded-[100%] cursor-pointer absolute -top-[20px] -right-[20px] p-[1px]"
-                  >
-                    <CloseRoundedIcon className="text-[8px] w-[30px] h-[30px]" />
-                  </div>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {imgFile && (
+                <div className="relative w-[75px] h-[75px]">
                   <img
+                    src={URL.createObjectURL(imgFile)}
+                    alt={imgFile.name}
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
-                    src={URL.createObjectURL(file)}
-                    alt=""
                   />
+                  <div
+                    onClick={() => setImgFile(null)}
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    ✕
+                  </div>
                 </div>
-              ) : (
+              )}
+
+              {!imgFile && (
                 <div
-                  onClick={() => fileRef.current.click()}
-                  className="border-[2px] w-full cursor-pointer border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                  onClick={() => (videoFile ? null : imgRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
                 >
                   + Surat goş
                 </div>
               )}
+              <input
+                ref={imgRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setImgFile(e.target.files[0])}
+              />
+            </div>
+          </div>
+
+          {/* Video Upload */}
+          <div className="w-[49%]">
+            <h1 className="text-[16px] font-[500]">Täzelik wideosy</h1>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {videoFile && (
+                <div className="relative w-[75px] h-[75px]">
+                  <video
+                    src={URL.createObjectURL(videoFile)}
+                    className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                    controls
+                  />
+                  <div
+                    onClick={() => setVideoFile(null)}
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    ✕
+                  </div>
+                </div>
+              )}
+
+              {!videoFile && (
+                <div
+                  onClick={() => (imgFile ? null : videoRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                >
+                  + Wideo goş
+                </div>
+              )}
+              <input
+                ref={videoRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setVideoFile(e.target.files[0])}
+              />
             </div>
           </div>
         </div>
@@ -150,7 +196,7 @@ const NewsCreate = () => {
               <input
                 value={news.name_tm}
                 onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
-                placeholder="Ady_tm"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -160,7 +206,7 @@ const NewsCreate = () => {
               <input
                 value={news.name_en}
                 onChange={(e) => setNews({ ...news, name_en: e.target.value })}
-                placeholder="Ady_en"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
@@ -170,8 +216,18 @@ const NewsCreate = () => {
               <input
                 value={news.name_ru}
                 onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
-                placeholder="Ady_ru"
+                placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Täzeligiň senesi</h1>
+              <input
+                value={news.date}
+                onChange={(e) => setNews({ ...news, date: e.target.value })}
+                type="date"
+                className="border-[1px] w-full border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>
@@ -182,8 +238,8 @@ const NewsCreate = () => {
               <textarea
                 value={news.text_tm}
                 onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
-                placeholder="Text_tm"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
 
@@ -192,8 +248,8 @@ const NewsCreate = () => {
               <textarea
                 value={news.text_en}
                 onChange={(e) => setNews({ ...news, text_en: e.target.value })}
-                placeholder="Text_en"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
 
@@ -202,8 +258,8 @@ const NewsCreate = () => {
               <textarea
                 value={news.text_ru}
                 onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
-                placeholder="Text_ru"
-                className="text-[14px] w-full min-h-[70px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                placeholder="Text..."
+                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>
