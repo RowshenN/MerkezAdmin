@@ -26,7 +26,7 @@ const Login = () => {
       if (result?.token) {
         localStorage.setItem("userData", JSON.stringify(result));
         message.success("Üstünlikli!");
-        window.open("/home", "_self"); // or history.push("/home")
+        window.open("/contact", "_self"); // or history.push("/home")
       } else {
         message.warning("Ilki registratsiýa bolmaly!");
         history.push("/signup");

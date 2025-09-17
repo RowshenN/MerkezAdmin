@@ -40,12 +40,12 @@ const App = () => {
       <ScrollIntoView>
         <Suspense fallback={<PageLoading />}>
           <Switch>
-            <PrivateRoute
+            {/* <PrivateRoute
               restricted={true}
               component={Contact}
               path="/"
               exact
-            />
+            /> */}
 
             <PrivateRoute
               restricted={true}
