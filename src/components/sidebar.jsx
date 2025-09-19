@@ -225,39 +225,24 @@ export default function Sidebar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="16"
-                  rx="2"
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
                   stroke="#3B82F6"
                   strokeWidth="2"
                 />
-                <line
-                  x1="7"
-                  y1="8"
-                  x2="17"
-                  y2="8"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-                <line
-                  x1="7"
-                  y1="12"
-                  x2="17"
-                  y2="12"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-                <line
-                  x1="7"
-                  y1="16"
-                  x2="13"
-                  y2="16"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
+                <text
+                  x="12"
+                  y="16"
+                  text-anchor="middle"
+                  font-size="6"
+                  fill="#3B82F6"
+                  font-family="Arial, sans-serif"
+                  font-weight="bold"
+                >
+                  NEWS
+                </text>
               </svg>
 
               <ListItemContent>
@@ -279,11 +264,27 @@ export default function Sidebar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M4 4H10V10H4V4Z" fill="#3B82F6" />
-                <path d="M14 4H20V10H14V4Z" fill="#3B82F6" />
-                <path d="M4 14H10V20H4V14Z" fill="#3B82F6" />
-                <path d="M14 14H20V20H14V14Z" fill="#3B82F6" />
-                <path d="M2 2H22V22H2V2Z" stroke="#3B82F6" strokeWidth="2" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M8 10L12 8L16 10L12 12L8 10Z"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M8 14L12 12L16 14L12 16L8 14Z"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
 
               <ListItemContent>
@@ -313,11 +314,10 @@ export default function Sidebar() {
                   strokeWidth="2"
                 />
                 <path
-                  d="M7 12.5L10.5 16L17 8.5"
+                  d="M8 9H16M8 12H16M8 15H16"
                   stroke="#3B82F6"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
               </svg>
 
