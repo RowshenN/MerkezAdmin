@@ -1,6 +1,5 @@
 import { lazy } from "react";
 export const Login = lazy(() => import("./login/login"));
-export const Signup = lazy(() => import("./login/signup"));
 
 export const News = lazy(() => import("./news/news"));
 export const NewsCreate = lazy(() => import("./news/newsCreate"));

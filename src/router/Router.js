@@ -7,7 +7,6 @@ import {
   NewsCreate,
   NewsUpdate,
   Login,
-  Signup,
   Admins,
   AdminsUpdate,
   AdminsCreate,
@@ -195,7 +194,6 @@ const App = () => {
 
             <Route path="/" exact component={Login} />
             <Route path="/login" exact component={Login} />
-            {/* <Route path="/signup" exact component={Signup} /> */}
           </Switch>
         </Suspense>
       </ScrollIntoView>

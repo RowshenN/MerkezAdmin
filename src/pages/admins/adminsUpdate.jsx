@@ -19,7 +19,7 @@ const AdminsUpdate = () => {
 
   const [user, setUser] = useState({
     name: "",
-    lastname: "",
+    lastName: "",
     phone: "",
     can_message: true,
     position: "",
@@ -31,12 +31,12 @@ const AdminsUpdate = () => {
   const [deleteAdmin] = useDestroyAdminMutation();
   const { data: custumers, error, isLoading } = useGetAdminQuery(id);
 
-  // Map backend lastName → frontend lastname
+  // Map backend lastName → frontend lastName
   useEffect(() => {
     if (custumers) {
       setUser({
         ...custumers,
-        lastname: custumers.lastName,
+        lastName: custumers.lastName,
         can_message: custumers.can_message ?? true,
       });
     }
@@ -47,7 +47,7 @@ const AdminsUpdate = () => {
       const bodyData = {
         id,
         name: user.name,
-        lastName: user.lastname,
+        lastName: user.lastName,
         phone: user.phone,
         can_message: user.can_message,
         position: user.position,
@@ -97,8 +97,8 @@ const AdminsUpdate = () => {
           <div className="w-[49%]">
             <h1 className="text-[16px] font-[500]">Familiýasy</h1>
             <input
-              value={user.lastname}
-              onChange={(e) => setUser({ ...user, lastname: e.target.value })}
+              value={user.lastName}
+              onChange={(e) => setUser({ ...user, lastName: e.target.value })}
               className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               placeholder="Girizilmedik"
             />
@@ -127,46 +127,12 @@ const AdminsUpdate = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between py-[15px]">
-          <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Wezipesi</h1>
-            <input
-              value={user.position}
-              onChange={(e) => setUser({ ...user, position: e.target.value })}
-              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              placeholder="Girizilmedik"
-            />
-          </div>
-          <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Görnüşi</h1>
-            <Select
-              value={user.type}
-              onChange={(value) => setUser({ ...user, type: value })}
-              placeholder="Hemmesini görkez"
-              className="text-[14px] w-full h-[47px] mt-1 text-black font-[400] border-[1px] !bg-white !border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              indicator={<KeyboardArrowDown className="!text-[16px]" />}
-              sx={{
-                [`& .${selectClasses.indicator}`]: {
-                  transition: "0.2s",
-                  [`&.${selectClasses.expanded}`]: {
-                    transform: "rotate(-180deg)",
-                  },
-                },
-              }}
-            >
-              <Option value="admin">Admin</Option>
-              <Option value="developer">Developer</Option>
-            </Select>
-          </div>
-        </div>
-
         {/* Status */}
         <div className="flex items-center border-t-[1px] justify-between py-[30px]">
           <div className="w-[380px]">
             <h1 className="text-[18px] font-[500]">Status</h1>
             <p className="text-[14px] mt-2 font-[500] text-[#98A2B2]">
-              Message ugradyp ýa-da ugratmaýanlygyny kesgitlemek üçin status
-              düzüň
+              Admin aktiwlygyny kesgitlemek üçin status düzüň
             </p>
           </div>
           <div className="flex justify-start w-[550px]">

@@ -78,18 +78,6 @@ const Login = () => {
             />
           </div>
 
-          <div className="px-4 text-black text-[16px] font-[400] h-[50px] w-[400px] rounded-[6px] border border-[#98A2B2] flex items-center justify-start ">
-            <p className="text-[18px] font-[sfmedium] ">
-              Registratsiýa bolmadyk bolsanyz{" "}
-              <span
-                onClick={() => history.push("/signup")}
-                className="cursor-pointer text-blue "
-              >
-                Registratsiýa
-              </span>{" "}
-            </p>
-          </div>
-
           <button
             disabled={isLoading}
             onClick={sign}

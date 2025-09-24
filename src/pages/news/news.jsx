@@ -156,7 +156,7 @@ const News = () => {
                     <img
                       src={`${
                         process.env.REACT_APP_BASE_URL
-                      }uploads/news/${item.Imgs[0].src.split("\\").pop()}`}
+                      }./${item.Imgs[0].src.split("\\").pop()}`}
                       alt={item?.Imgs[0]?.name || "news image"}
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
                     />
@@ -228,7 +228,7 @@ const News = () => {
                   </svg>
                 </div>
 
-                <div
+                {/* <div
                   onClick={() => {
                     setISDelete(true);
                     setIdentifier(item.id);
@@ -245,7 +245,7 @@ const News = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </div>
+                </div> */}
               </h1>
             </div>
           ))

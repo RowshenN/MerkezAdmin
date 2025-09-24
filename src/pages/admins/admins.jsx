@@ -133,7 +133,7 @@ const Admins = () => {
         </div>
 
         {/* Table body */}
-        {users?.map((item, i) => {
+        {rawAdmins?.map((item, i) => {
           return loading ? (
             <PageLoading key={i} />
           ) : (

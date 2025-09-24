@@ -80,10 +80,10 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
         className="h-[100px] font-[600] text-[22px] border-b-[1px] border-[#E9EBF0] flex items-center justify-start pl-7"
       >
-        Açyk Asman Ýyldyzy Admin
+        Açyk Asman Ýyldyzy
       </div>
 
-      <div className="min-h-[100px]  h-[100px] w-[80%] mx-auto border-b-[1px] border-[#E9EBF0] gap-4 font-[600] text-[22px]   flex items-center justify-center">
+      <div className="min-h-[70px]   w-[80%] mx-auto border-b-[1px] border-[#E9EBF0] gap-4 font-[600] text-[22px]   flex items-center justify-center">
         <div className="min-w-[50px] min-h-[50px] rounded-[100%] bg-[#E9EBF0]">
           <img
             className="w-[50px] h-[50px] rounded-[100%] bg-[#E9EBF0]"
@@ -93,12 +93,7 @@ export default function Sidebar() {
         </div>
         <div className="flex gap-1 flex-wrap w-full">
           <div className="text-[14px] w-full font-[500]">
-            {(user?.user?.username != null ? user?.user?.username : "") +
-              " " +
-              (user?.user?.position != null ? user?.user?.position : "")}
-          </div>
-          <div className="text-[12px] font-[600] text-[#B8BFCC]">
-            {/* {user?.admin?.role} */}
+            {user?.name != null ? user?.name : ""}
           </div>
         </div>
       </div>
