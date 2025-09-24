@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Select, { selectClasses } from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import Button from "@mui/joy/Button";
@@ -6,8 +6,9 @@ import Modal from "@mui/joy/Modal";
 import Sheet from "@mui/joy/Sheet";
 import { KeyboardArrowDown, Add } from "@mui/icons-material";
 import { useHistory, useLocation } from "react-router-dom";
-import Pagination from "../../components/pagination";
 import PageLoading from "../../components/PageLoading";
+import { message } from "antd";
+
 import {
   useGetAllWorksQuery,
   useDestroyWorkMutation,
@@ -17,16 +18,13 @@ const Works = () => {
   const path = useLocation();
   const history = useHistory();
 
-  const [pages, setPages] = useState([]);
-  const [selecteds, setSelecteds] = useState([]);
-  const [allSelected, setAllSelected] = useState(false);
-  const [isDelete, setISDelete] = useState(false);
-  const [isId, setIsId] = useState(null);
   const [filter, setFilter] = useState({
     name: "",
     order: "default",
     deleted: "false",
   });
+  const [isDelete, setISDelete] = useState(false);
+  const [identifier, setIdentifier] = useState(null);
 
   const mappedFilter = {
     ...filter,
@@ -40,49 +38,28 @@ const Works = () => {
   };
 
   const {
-    data: worksData,
+    data: rawWorks = [],
     isLoading,
     refetch,
   } = useGetAllWorksQuery(mappedFilter, {
     refetchOnMountOrArgChange: true,
   });
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+  const works = Array.isArray(rawWorks)
+    ? [...rawWorks].reverse()
+    : rawWorks?.data || [];
 
-  const [deleteWork] = useDestroyWorkMutation();
+  const [destroyWork] = useDestroyWorkMutation();
 
-  const rawWorks = Array.isArray(worksData) ? worksData : worksData?.data || [];
-  const works = Array.isArray(rawWorks) ? [...rawWorks].reverse() : [];
-
-  const selectItem = (id) => {
-    setSelecteds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const selectAll = () => {
-    setAllSelected(true);
-    setSelecteds(works.map((item) => item.id));
-  };
-
-  const isSelected = (id) => selecteds.includes(id);
-
-  const handleDeleteWork = async () => {
+  const handleDestroy = async () => {
     try {
-      await deleteWork(isId).unwrap();
+      await destroyWork(identifier).unwrap();
+      message.success("Iş üstünlikli pozuldy");
       setISDelete(false);
-      setSelecteds([]);
-      setAllSelected(false);
       refetch();
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
+      message.error("Iş pozulmady");
     }
   };
 
@@ -110,9 +87,10 @@ const Works = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z) </Option>
-            <Option value="desc">-Adyna görä (Z-A) </Option>
+            <Option value="asc">Adyna görä (A-Z)</Option>
+            <Option value="desc">Adyna görä (Z-A)</Option>
           </Select>
+
           <Select
             placeholder="Hemmesini görkez"
             onChange={(e, value) => setFilter({ ...filter, deleted: value })}
@@ -132,6 +110,7 @@ const Works = () => {
             <Option value="false">Aktiw</Option>
             <Option value="true">Aktiw däl</Option>
           </Select>
+
           <Button
             onClick={() => history.push({ pathname: "/works/create" })}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
@@ -147,90 +126,90 @@ const Works = () => {
         {/* Search */}
         <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
           <input
+            type="text"
+            placeholder="Gözleg"
             value={filter.name}
             onChange={(e) => setFilter({ ...filter, name: e.target.value })}
-            type="text"
             className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
-            placeholder="Gözleg"
           />
         </div>
 
         {/* Table Header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
-            Surat
+            Media
           </h1>
-          <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[23%] uppercase">
+          <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
             Ady
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[42%] whitespace-nowrap uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[47%] whitespace-nowrap uppercase">
             Text
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[23%] whitespace-nowrap uppercase">
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[8%] text-center uppercase">
             Senesi
           </h1>
-          <h1 className="text-[14px]  font-[500] whitespace-nowrap text-[#98A2B2] w-[15%] text-left uppercase">
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
             Status
           </h1>
         </div>
 
         {/* Table Body */}
-        {works &&
-          works?.map((item, i) => (
+        {Array.isArray(works) ? (
+          works.map((item, i) => (
             <div
               key={"work" + i}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
-              <div className="w-[8%] min-w-[45px]">
-                <h1 className="rounded-[4px] flex items-center justify-center w-[40px] h-[40px] bg-[#F7F8FA]">
-                  <div className="relative w-[40px] h-[40px]">
-                    {item?.Imgs?.length > 0 ? (
-                      <img
-                        src={`${
-                          process.env.REACT_APP_BASE_URL
-                        }uploads/work/${item.Imgs[0].src.split("\\").pop()}`}
-                        alt={item?.Imgs[0]?.name || "work"}
-                        className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                      />
-                    ) : item?.Videos?.length > 0 ? (
-                      <video
-                        className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                        src={`${
-                          process.env.REACT_APP_BASE_URL
-                        }uploads/work/${item.Videos[0].src.split("\\").pop()}`}
-                      />
-                    ) : (
-                      <img
-                        src="/placeholder.png"
-                        alt="placeholder"
-                        className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                      />
-                    )}
+              <div className="w-[8%] min-w-[45px] flex gap-1">
+                <div className="relative w-[40px] h-[40px]">
+                  {item?.Imgs?.length > 0 ? (
+                    <img
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }./${item.Imgs[0].src.split("\\").pop()}`}
+                      alt={item?.Imgs[0]?.name || "work"}
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                    />
+                  ) : item?.Videos?.length > 0 ? (
+                    <video
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }${item.Videos[0].src.split("\\").pop()}`}
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                      controls={false}
+                    />
+                  ) : (
+                    <img
+                      src="/placeholder.png"
+                      alt="placeholder"
+                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                    />
+                  )}
 
-                    {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
-                      <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
-                        Video
-                      </span>
-                    )}
-                  </div>
-                </h1>
+                  {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
+                    <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
+                      Video
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <h1 className="text-[14px] font-[500] text-black w-[23%] ">
+              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[25%]">
                 {item?.name_tm}
               </h1>
-
-              <h1 className="text-[14px] font-[500] text-black w-[42%] ">
+              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[45%]">
                 {item?.text_tm}
               </h1>
 
-              <h1 className="text-[14px]  font-[500] text-black w-[23%] ">
-                {formatDate(item?.date)}
+              <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
+                {item?.date
+                  ? new Date(item.date).toLocaleDateString("en-GB")
+                  : "-"}
               </h1>
 
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[13%] uppercase">
+              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
                 <div
-                  className={`bg-opacity-15 whitespace-nowrap px-4 py-2 w-fit rounded-[12px] ${
+                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
                     item?.deleted
                       ? "text-[#E9B500] bg-[#E9B500]"
                       : "text-[#44CE62] bg-[#44CE62]"
@@ -258,10 +237,10 @@ const Works = () => {
                   </svg>
                 </div>
 
-                <div
+                {/* <div
                   onClick={() => {
                     setISDelete(true);
-                    setIsId(item.id);
+                    setIdentifier(item.id);
                   }}
                   className="cursor-pointer"
                 >
@@ -275,56 +254,16 @@ const Works = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </div>
+                </div> */}
               </h1>
             </div>
-          ))}
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-white h-fit py-1">
-          {selecteds?.length === 0 ? (
-            <div className="w-full flex mt-5 justify-between items-center">
-              <h1 className="text-[14px] font-[400]">{works?.length} işler</h1>
-              <Pagination
-                meta={{}}
-                pages={pages}
-                pageNo={filter.page}
-                length={works?.length}
-                next={() => setFilter({ ...filter, page: filter.page + 1 })}
-                prev={() => setFilter({ ...filter, page: filter.page - 1 })}
-                goTo={(item) => setFilter({ ...filter, page: item })}
-              />
-            </div>
-          ) : (
-            <div className="w-full mt-2 flex justify-between items-center bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
-              <h1 className="text-[14px] font-[400]">
-                {selecteds?.length + " "} sany saýlandy
-              </h1>
-              <div className="w-fit flex gap-6 items-center ">
-                <button
-                  onClick={() => {
-                    setSelecteds([]);
-                    setAllSelected(false);
-                  }}
-                  className="text-[#98A2B2] text-[14px] font-[500] py-[11px] px-[27px] hover:bg-blue hover:text-white rounded-[8px]"
-                >
-                  Goýbolsun et
-                </button>
-                <button
-                  onClick={() => setISDelete(true)}
-                  className="text-white text-[14px] font-[500] py-[11px] px-[27px] bg-[#FF4D4D] rounded-[8px]"
-                >
-                  Aýyr
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+          ))
+        ) : (
+          <div>Ýok</div>
+        )}
 
         {/* Delete Modal */}
         <Modal
-          aria-labelledby="modal-title"
-          aria-describedby="modal-desc"
           open={isDelete}
           onClose={() => setISDelete(false)}
           sx={{
@@ -334,7 +273,6 @@ const Works = () => {
           }}
         >
           <Sheet
-            variant="outlined"
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
@@ -361,7 +299,6 @@ const Works = () => {
               <h1 className="text-[16px] text-center my-10 font-[400]">
                 Işi aýyrmak isleýärsiňizmi?
               </h1>
-
               <div className="flex gap-[29px] justify-center">
                 <button
                   onClick={() => setISDelete(false)}
@@ -370,7 +307,7 @@ const Works = () => {
                   Goýbolsun et
                 </button>
                 <button
-                  onClick={handleDeleteWork}
+                  onClick={handleDestroy}
                   className="text-[14px] font-[500] text-white hover:bg-[#fd6060] bg-[#FF4D4D] rounded-[8px] px-6 py-3"
                 >
                   Aýyr

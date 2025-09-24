@@ -164,7 +164,7 @@ const News = () => {
                     <video
                       src={`${
                         process.env.REACT_APP_BASE_URL
-                      }uploads/news/${item.Videos[0].src.split("\\").pop()}`}
+                      }${item.Videos[0].src.split("\\").pop()}`}
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
                       controls={false}
                     />
@@ -185,10 +185,10 @@ const News = () => {
                 </div>
               </div>
 
-              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[25%]">
                 {item?.name_tm}
               </h1>
-              <h1 className="text-[14px] font-[500] text-black w-[45%]">
+              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[45%]">
                 {item?.text_tm}
               </h1>
 

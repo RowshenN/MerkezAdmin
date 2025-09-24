@@ -150,18 +150,18 @@ const Banner = () => {
             >
               <div className="w-[10%] min-w-[60px] flex justify-start">
                 <img
-                  src={`${
-                    process.env.REACT_APP_BASE_URL
-                  }uploads/banner/${item?.img.split("\\").pop()}`}
+                  src={`${process.env.REACT_APP_BASE_URL}${item?.img
+                    .split("\\")
+                    .pop()}`}
                   alt={item?.Imgs?.[0]?.name || "work image"}
                   className="object-cover w-[40px] h-[40px] rounded-[4px]"
                 />
               </div>
 
-              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+              <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[25%]">
                 {item?.title_tm}
               </h1>
-              <h1 className="text-[14px] font-[500] text-black w-[30%]">
+              <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[30%]">
                 {item?.text_tm}
               </h1>
 
@@ -198,7 +198,7 @@ const Banner = () => {
                 </div>
 
                 {/* Red Trash */}
-                <button
+                {/* <button
                   onClick={() => {
                     setSelectedId(item.id);
                     setIsDelete(true);
@@ -215,7 +215,7 @@ const Banner = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
           ))

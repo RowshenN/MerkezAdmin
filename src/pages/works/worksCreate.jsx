@@ -14,13 +14,13 @@ const WorksCreate = () => {
   const history = useHistory();
   const [createWork, { isLoading }] = useCreateWorkMutation();
 
-  const [file, setFile] = useState(null);
+  const imgRef = useRef(null);
+  const videoRef = useRef(null);
+
+  const [imgFile, setImgFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const [bigPostPicture, setBigPostPicture] = useState(null);
   const [warning, setWarning] = useState(false);
-
-  const fileRef = useRef(null);
-  const videoRef = useRef(null);
 
   const [work, setWork] = useState({
     name_tm: "",
@@ -39,7 +39,8 @@ const WorksCreate = () => {
       !work.name_en ||
       !work.text_tm ||
       !work.text_ru ||
-      !work.text_en
+      !work.text_en ||
+      !work.date
     ) {
       setWarning(true);
       return;
@@ -53,16 +54,17 @@ const WorksCreate = () => {
     formData.append("text_ru", work.text_ru);
     formData.append("text_en", work.text_en);
     formData.append("date", work.date);
-    if (file) formData.append("img", file);
+
+    if (imgFile) formData.append("img", imgFile);
     if (videoFile) formData.append("video", videoFile);
 
     try {
       await createWork(formData).unwrap();
       message.success("Iş üstünlikli döredildi!");
-      history.goBack();
+      history.push("/works");
     } catch (err) {
       console.error(err);
-      message.error("Başartmady!");
+      message.error("Maglumatlary barlaň");
     }
   };
 
@@ -70,19 +72,19 @@ const WorksCreate = () => {
 
   return (
     <div className="w-full">
+      {/* Warning Alert */}
       {warning && (
         <Alert
           className="!fixed z-50 top-5 right-5"
-          key={"title"}
           sx={{ alignItems: "flex-start" }}
           startDecorator={<WarningIcon />}
           variant="soft"
-          color={"warning"}
+          color="warning"
           endDecorator={
             <IconButton
               onClick={() => setWarning(false)}
               variant="soft"
-              color={"warning"}
+              color="warning"
             >
               <CloseRoundedIcon />
             </IconButton>
@@ -90,7 +92,7 @@ const WorksCreate = () => {
         >
           <div>
             <div>{"Maglumat nädogry!"}</div>
-            <Typography level="body-sm" color={"warning"}>
+            <Typography level="body-sm" color="warning">
               Maglumatlary doly we dogry girizmeli!
             </Typography>
           </div>
@@ -99,7 +101,7 @@ const WorksCreate = () => {
 
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Edilen iş döretmek</h1>
+        <h1 className="text-[30px] font-[700]">Edilen iş</h1>
       </div>
 
       {/* Form */}
@@ -109,78 +111,87 @@ const WorksCreate = () => {
           <h1 className="text-[20px] font-[500]">Edilen işiň maglumaty</h1>
         </div>
 
-        {/* Image Upload */}
-        <div className="flex items-center object-contain justify-between py-[30px]">
+        {/* Image & Video Upload */}
+        <div className="flex items-start justify-between py-[30px] gap-4">
+          {/* Image Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Surat</h1>
-            <div className="flex gap-5 mt-5 justify-start">
-              <input
-                onChange={(e) => setFile(e.target.files[0])}
-                ref={fileRef}
-                className="hidden"
-                type="file"
-              />
-              {file ? (
-                <div className="w-[75px] h-[75px] p-0 cursor-pointer border-[#98A2B2] rounded-[6px] relative">
-                  <div
-                    onClick={() => setFile(null)}
-                    className="bg-gray-100 text-[8px] w-[30px] h-[30px] border-2 rounded-[100%] cursor-pointer absolute -top-[20px] -right-[20px] p-[1px]"
-                  >
-                    <CloseRoundedIcon className="text-[8px] w-[30px] h-[30px]" />
-                  </div>
+            <h1 className="text-[16px] font-[500]">Işiň suraty</h1>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {imgFile && (
+                <div className="relative w-[75px] h-[75px]">
                   <img
+                    src={URL.createObjectURL(imgFile)}
+                    alt={imgFile.name}
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
-                    src={URL.createObjectURL(file)}
-                    alt=""
                   />
+                  <div
+                    onClick={() => setImgFile(null)}
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    ✕
+                  </div>
                 </div>
-              ) : (
+              )}
+
+              {!imgFile && (
                 <div
-                  onClick={() => fileRef.current.click()}
-                  className="border-[2px] cursor-pointer w-full border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                  onClick={() => (videoFile ? null : imgRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
                 >
                   + Surat goş
                 </div>
               )}
+              <input
+                ref={imgRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setImgFile(e.target.files[0])}
+              />
             </div>
           </div>
 
           {/* Video Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Wideo</h1>
-            <div className="flex gap-5 mt-5 justify-start">
-              <input
-                onChange={(e) => setVideoFile(e.target.files[0])}
-                ref={videoRef}
-                className="hidden"
-                type="file"
-              />
-              {videoFile ? (
-                <div className="p-2 border rounded cursor-pointer relative">
+            <h1 className="text-[16px] font-[500]">Işiň wideosy</h1>
+            <div className="flex gap-5 mt-5 flex-wrap">
+              {videoFile && (
+                <div className="relative w-[75px] h-[75px]">
+                  <video
+                    src={URL.createObjectURL(videoFile)}
+                    className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                    controls
+                  />
                   <div
                     onClick={() => setVideoFile(null)}
-                    className="absolute -top-2 -right-2 bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center"
+                    className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
                   >
-                    X
+                    ✕
                   </div>
-                  <p>{videoFile.name}</p>
                 </div>
-              ) : (
+              )}
+
+              {!videoFile && (
                 <div
-                  onClick={() => videoRef.current.click()}
-                  className="border-[2px] cursor-pointer w-full border-[#98A2B2] border-dashed p-[25px] rounded-[6px]"
+                  onClick={() => (imgFile ? null : videoRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
                 >
                   + Wideo goş
                 </div>
               )}
+              <input
+                ref={videoRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => setVideoFile(e.target.files[0])}
+              />
             </div>
           </div>
         </div>
 
         {/* Input fields */}
-        <div className="flex items-start justify-between py-[15px]">
+        <div className="flex items-start justify-between pt-7">
           <div className="w-[49%] flex flex-col items-start justify-start gap-4">
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <div className="w-full flex flex-col gap-2">
               <h1>Ady (türkmen dilinde)</h1>
               <input
                 value={work.name_tm}
@@ -190,7 +201,19 @@ const WorksCreate = () => {
               />
             </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <div className="w-full flex flex-col gap-2">
+              <h1>Ady (rus dilinde)</h1>
+              <input
+                value={work.name_ru}
+                onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
+                placeholder="Ady..."
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
+            <div className="w-full flex flex-col gap-2">
               <h1>Ady (iňlis dilinde)</h1>
               <input
                 value={work.name_en}
@@ -200,18 +223,8 @@ const WorksCreate = () => {
               />
             </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Ady (rus dilinde)</h1>
-              <input
-                value={work.name_ru}
-                onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
-                placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
-
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Edilen işiň senesi</h1>
+            <div className="w-full flex flex-col gap-2">
+              <h1>Işiň senesi</h1>
               <input
                 value={work.date}
                 onChange={(e) => setWork({ ...work, date: e.target.value })}
@@ -220,42 +233,43 @@ const WorksCreate = () => {
               />
             </div>
           </div>
+        </div>
 
-          <div className="w-[49%] flex flex-col items-baseline justify-start gap-4">
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (türkmen dilinde)</h1>
-              <textarea
-                value={work.text_tm}
-                onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+        {/* Textareas */}
+        <div className="w-full mt-4 flex flex-col gap-4">
+          <div className="w-full flex flex-col gap-2">
+            <h1>Beýany (türkmen dilinde)</h1>
+            <textarea
+              value={work.text_tm}
+              onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
+          </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (iňlis dilinde)</h1>
-              <textarea
-                value={work.text_en}
-                onChange={(e) => setWork({ ...work, text_en: e.target.value })}
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+          <div className="w-full flex flex-col gap-2">
+            <h1>Beýany (iňlis dilinde) </h1>
+            <textarea
+              value={work.text_en}
+              onChange={(e) => setWork({ ...work, text_en: e.target.value })}
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
+          </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (rus dilinde)</h1>
-              <textarea
-                value={work.text_ru}
-                onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+          <div className="w-full flex flex-col gap-2">
+            <h1>Beýany (rus dilinde)</h1>
+            <textarea
+              value={work.text_ru}
+              onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
           </div>
         </div>
       </div>
 
-      {/* Footer buttons */}
+      {/* Footer */}
       <div className="sticky bottom-0 py-2 bg-[#F7F8FA] w-full">
         <div className="w-full mt-4 flex justify-end gap-5 items-center bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
           <button
@@ -273,7 +287,7 @@ const WorksCreate = () => {
         </div>
       </div>
 
-      {/* Big picture modal */}
+      {/* Big image modal */}
       <Modal
         open={bigPostPicture != null}
         onClose={() => setBigPostPicture(null)}

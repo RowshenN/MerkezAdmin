@@ -1,25 +1,26 @@
 import React, { useRef, useState } from "react";
 import Alert from "@mui/joy/Alert";
-import { IconButton } from "@mui/joy";
-import Typography from "@mui/joy/Typography";
+import { IconButton, Typography } from "@mui/joy";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import WarningIcon from "@mui/icons-material/Warning";
-import { useHistory } from "react-router-dom";
+import Modal from "@mui/joy/Modal";
+import Sheet from "@mui/joy/Sheet";
 import PageLoading from "../../components/PageLoading";
+import { useHistory } from "react-router-dom";
 import { message } from "antd";
+
 import { useCreateServiceMutation } from "../../services/service";
 
 const ServiceCreate = () => {
   const history = useHistory();
-  const [loading, setLoading] = useState(false);
-  const [warning, setWarning] = useState(false);
-
   const imgRef = useRef(null);
   const videoRef = useRef(null);
 
   const [imgFile, setImgFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
+  const [bigPostPicture, setBigPostPicture] = useState(null);
 
+  const [warning, setWarning] = useState(false);
   const [product, setProduct] = useState({
     name_tm: "",
     name_ru: "",
@@ -30,10 +31,18 @@ const ServiceCreate = () => {
     date: "",
   });
 
-  const [createService] = useCreateServiceMutation();
+  const [createService, { isLoading }] = useCreateServiceMutation();
 
   const handleCreate = async () => {
-    if (!product.name_tm) {
+    if (
+      !product.name_tm ||
+      !product.name_ru ||
+      !product.name_en ||
+      !product.text_tm ||
+      !product.text_ru ||
+      !product.text_en ||
+      !product.date
+    ) {
       setWarning(true);
       return;
     }
@@ -50,35 +59,33 @@ const ServiceCreate = () => {
     if (imgFile) formData.append("img", imgFile);
     if (videoFile) formData.append("video", videoFile);
 
-    setLoading(true);
     try {
       await createService(formData).unwrap();
-      message.success("Service created successfully!");
+      message.success("Hyzmat üstünlikli döredildi!");
       history.push("/service");
-    } catch (err) {
-      console.error("Error creating service:", err);
-      message.warning("Başartmady!");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error creating service:", error);
+      message.error("Maglumatlary barlaň");
     }
   };
 
-  if (loading) return <PageLoading />;
+  if (isLoading) return <PageLoading />;
 
   return (
     <div className="w-full">
       {warning && (
         <Alert
           className="!fixed z-50 top-5 right-5"
+          key={"title"}
           sx={{ alignItems: "flex-start" }}
           startDecorator={<WarningIcon />}
           variant="soft"
-          color="warning"
+          color={"warning"}
           endDecorator={
             <IconButton
               onClick={() => setWarning(false)}
               variant="soft"
-              color="warning"
+              color={"warning"}
             >
               <CloseRoundedIcon />
             </IconButton>
@@ -86,7 +93,7 @@ const ServiceCreate = () => {
         >
           <div>
             <div>{"Maglumat nädogry!"}</div>
-            <Typography level="body-sm" color="warning">
+            <Typography level="body-sm" color={"warning"}>
               Maglumatlary doly we dogry girizmeli!
             </Typography>
           </div>
@@ -108,7 +115,7 @@ const ServiceCreate = () => {
         <div className="flex items-start justify-between py-[30px] gap-4">
           {/* Image Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Surat</h1>
+            <h1 className="text-[16px] font-[500]">Hyzmat suratlary</h1>
             <div className="flex gap-5 mt-5 flex-wrap">
               {imgFile && (
                 <div className="relative w-[75px] h-[75px]">
@@ -116,6 +123,9 @@ const ServiceCreate = () => {
                     src={URL.createObjectURL(imgFile)}
                     alt={imgFile.name}
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
+                    onClick={() =>
+                      setBigPostPicture(URL.createObjectURL(imgFile))
+                    }
                   />
                   <div
                     onClick={() => setImgFile(null)}
@@ -145,7 +155,7 @@ const ServiceCreate = () => {
 
           {/* Video Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Wideo</h1>
+            <h1 className="text-[16px] font-[500]">Hyzmat wideosy</h1>
             <div className="flex gap-5 mt-5 flex-wrap">
               {videoFile && (
                 <div className="relative w-[75px] h-[75px]">
@@ -181,9 +191,9 @@ const ServiceCreate = () => {
           </div>
         </div>
 
-        {/* Text Inputs */}
-        <div className="flex items-start justify-between py-[15px] gap-5">
-          <div className="w-[49%] flex flex-col gap-4">
+        {/* Input fields */}
+        <div className="flex items-start justify-between pt-7">
+          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (türkmen dilinde)</h1>
               <input
@@ -197,23 +207,24 @@ const ServiceCreate = () => {
             </div>
 
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Ady (iňlis dilinde)</h1>
-              <input
-                value={product.name_en}
-                onChange={(e) =>
-                  setProduct({ ...product, name_en: e.target.value })
-                }
-                placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
-
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (rus dilinde)</h1>
               <input
                 value={product.name_ru}
                 onChange={(e) =>
                   setProduct({ ...product, name_ru: e.target.value })
+                }
+                placeholder="Ady..."
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              />
+            </div>
+          </div>
+          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Ady (iňlis dilinde)</h1>
+              <input
+                value={product.name_en}
+                onChange={(e) =>
+                  setProduct({ ...product, name_en: e.target.value })
                 }
                 placeholder="Ady..."
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
@@ -232,65 +243,89 @@ const ServiceCreate = () => {
               />
             </div>
           </div>
-          <div className="w-[49%] flex flex-col gap-4">
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (türkmen dilinde)</h1>
-              <textarea
-                value={product.text_tm}
-                onChange={(e) =>
-                  setProduct({ ...product, text_tm: e.target.value })
-                }
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+        </div>
+        <div className="w-full mt-4 flex flex-col items-baseline justify-start gap-4">
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <h1>Beýany (türkmen dilinde)</h1>
+            <textarea
+              value={product.text_tm}
+              onChange={(e) =>
+                setProduct({ ...product, text_tm: e.target.value })
+              }
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
+          </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (iňlis dilinde)</h1>
-              <textarea
-                value={product.text_en}
-                onChange={(e) =>
-                  setProduct({ ...product, text_en: e.target.value })
-                }
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <h1>Beýany (iňlis dilinde)</h1>
+            <textarea
+              value={product.text_en}
+              onChange={(e) =>
+                setProduct({ ...product, text_en: e.target.value })
+              }
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
+          </div>
 
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Beýany (rus dilinde)</h1>
-              <textarea
-                value={product.text_ru}
-                onChange={(e) =>
-                  setProduct({ ...product, text_ru: e.target.value })
-                }
-                placeholder="Text..."
-                className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <h1>Beýany (rus dilinde) </h1>
+            <textarea
+              value={product.text_ru}
+              onChange={(e) =>
+                setProduct({ ...product, text_ru: e.target.value })
+              }
+              placeholder="Text..."
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <div className="sticky bottom-0 py-2 bg-[#F7F8FA] w-full">
-        <div className="w-full mt-4 flex justify-end items-center bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
-          <div className="w-fit flex gap-6 items-center">
-            <button
-              onClick={() => history.goBack()}
-              className="text-blue text-[14px] font-[500] py-[11px] px-[27px] hover:bg-red hover:text-white rounded-[8px]"
-            >
-              Goýbolsun et
-            </button>
-            <button
-              onClick={handleCreate}
-              className="text-white text-[14px] font-[500] py-[11px] px-[27px] bg-blue rounded-[8px] hover:bg-opacity-90"
-            >
-              Ýatda sakla
-            </button>
-          </div>
+        <div className="w-full mt-4 flex justify-end gap-5 items-center bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
+          <button
+            onClick={() => history.goBack()}
+            className="text-blue text-[14px] font-[500] py-[11px] px-[27px] hover:bg-red hover:text-white rounded-[8px]"
+          >
+            Goýbolsun et
+          </button>
+          <button
+            onClick={handleCreate}
+            className="text-white text-[14px] font-[500] py-[11px] px-[27px] bg-blue rounded-[8px] hover:bg-opacity-90"
+          >
+            Ýatda sakla
+          </button>
         </div>
       </div>
+
+      {/* Big image modal */}
+      <Modal
+        open={bigPostPicture != null}
+        onClose={() => setBigPostPicture(null)}
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
+        <Sheet
+          variant="outlined"
+          sx={{
+            maxWidth: 600,
+            width: "50%",
+            borderRadius: "md",
+            p: 3,
+            boxShadow: "lg",
+          }}
+        >
+          <div className="w-full flex justify-center items-center">
+            <img
+              className="w-[50%] object-contain"
+              src={bigPostPicture}
+              alt=""
+            />
+          </div>
+        </Sheet>
+      </Modal>
     </div>
   );
 };

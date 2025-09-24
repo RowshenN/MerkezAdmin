@@ -1,13 +1,13 @@
 import React, { useState } from "react";
+import Select, { selectClasses } from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
 import Button from "@mui/joy/Button";
 import Modal from "@mui/joy/Modal";
 import Sheet from "@mui/joy/Sheet";
-import Select, { selectClasses } from "@mui/joy/Select";
-import Option from "@mui/joy/Option";
 import { KeyboardArrowDown, Add } from "@mui/icons-material";
 import { useHistory, useLocation } from "react-router-dom";
 import PageLoading from "../../components/PageLoading";
-import Pagination from "../../components/pagination";
+
 import {
   useGetAllAboutsQuery,
   useDestroyAboutMutation,
@@ -15,13 +15,13 @@ import {
 
 const About = () => {
   const history = useHistory();
+  const path = useLocation();
+
   const [filter, setFilter] = useState({
     name: "",
     order: "default",
     deleted: "false",
   });
-
-  const path = useLocation();
 
   const mappedFilter = {
     ...filter,
@@ -34,27 +34,36 @@ const About = () => {
         : "",
   };
 
-  const { data: rawAbouts = [], isLoading } =
-    useGetAllAboutsQuery(mappedFilter);
-  const [destroyAbout] = useDestroyAboutMutation();
+  const {
+    data: rawAbouts = [],
+    isLoading,
+    refetch,
+  } = useGetAllAboutsQuery(mappedFilter);
 
   const abouts = Array.isArray(rawAbouts) ? [...rawAbouts].reverse() : [];
+  const [destroyAbout] = useDestroyAboutMutation();
 
-  // state for modal
   const [isDelete, setIsDelete] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  const handleConfirmDelete = async () => {
+  const handleDestroy = async () => {
     if (selectedId) {
-      await destroyAbout(selectedId);
-      setIsDelete(false);
-      setSelectedId(null);
+      try {
+        await destroyAbout(selectedId).unwrap();
+        setIsDelete(false);
+        setSelectedId(null);
+        refetch();
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
+  if (isLoading) return <PageLoading />;
+
   return (
     <div className="w-full">
-      {/* header section */}
+      {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
         <h1 className="text-[30px] font-[700]">Biz barada</h1>
         <div className="w-fit flex gap-5">
@@ -74,9 +83,10 @@ const About = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z) </Option>
-            <Option value="desc">-Adyna görä (Z-A) </Option>
+            <Option value="asc">Adyna görä (A-Z)</Option>
+            <Option value="desc">-Adyna görä (Z-A)</Option>
           </Select>
+
           <Select
             placeholder="Hemmesini görkez"
             onChange={(e, value) => setFilter({ ...filter, deleted: value })}
@@ -96,6 +106,7 @@ const About = () => {
             <Option value="false">Aktiw</Option>
             <Option value="true">Aktiw däl</Option>
           </Select>
+
           <Button
             onClick={() => history.push("/about/create")}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
@@ -122,9 +133,9 @@ const About = () => {
         {/* Table Header */}
         <div className="w-full gap-[30px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[32%] uppercase">
-            Header
+            Ady
           </h1>
-          <h1 className="text-[14px] font-[500]  text-[#98A2B2] w-[55%] min-w-[120px] whitespace-nowrap uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[55%] min-w-[120px] whitespace-nowrap uppercase">
             Text
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[10%] uppercase">
@@ -133,88 +144,51 @@ const About = () => {
         </div>
 
         {/* Table Body */}
-        {isLoading ? (
-          <PageLoading />
-        ) : (
-          abouts.map((item) => (
-            <div
-              key={item.id}
-              className="w-full gap-[30px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
-            >
-              <h1 className="text-[14px] font-[500] text-black w-[35%]">
-                {item?.name_tm}
-              </h1>
-              <h1 className="text-[14px]  font-[500] text-black w-[55%] min-w-[120px]">
-                {item?.text_tm}
-              </h1>
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
-                <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    item?.deleted
-                      ? "text-[#E9B500] bg-[#E9B500]"
-                      : "text-[#44CE62] bg-[#44CE62]"
-                  }`}
+        {abouts.map((item) => (
+          <div
+            key={item.id}
+            className="w-full gap-[30px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
+          >
+            <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[35%]">
+              {item?.name_tm}
+            </h1>
+            <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[55%] min-w-[120px]">
+              {item?.text_tm}
+            </h1>
+            <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
+              <div
+                className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
+                  item?.deleted
+                    ? "text-[#E9B500] bg-[#E9B500]"
+                    : "text-[#44CE62] bg-[#44CE62]"
+                }`}
+              >
+                {item?.deleted ? "Aktiw däl" : "Aktiw"}
+              </div>
+
+              <div
+                onClick={() =>
+                  history.push({ pathname: path?.pathname + "/" + item?.id })
+                }
+                className="cursor-pointer p-2"
+              >
+                <svg
+                  width="3"
+                  height="15"
+                  viewBox="0 0 3 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
-                </div>
+                  <circle cx="1.5" cy="1.5" r="1.5" fill="black" />
+                  <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
+                  <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
+                </svg>
+              </div>
+            </h1>
+          </div>
+        ))}
 
-                <div
-                  onClick={() =>
-                    history.push({ pathname: path?.pathname + "/" + item?.id })
-                  }
-                  className="cursor-pointer p-2"
-                >
-                  <svg
-                    width="3"
-                    height="15"
-                    viewBox="0 0 3 15"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="1.5" cy="1.5" r="1.5" fill="black" />
-                    <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
-                    <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
-                  </svg>
-                </div>
-
-                <div
-                  onClick={() => {
-                    setIsDelete(true);
-                    setSelectedId(item.id);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="red"
-                    viewBox="0 0 24 24"
-                    width="20"
-                    height="20"
-                  >
-                    <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
-                    <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
-                  </svg>
-                </div>
-              </h1>
-            </div>
-          ))
-        )}
-
-        {/* Table footer / Pagination */}
-        <div className="w-full flex mt-5 justify-between items-center">
-          <h1 className="text-[14px] font-[400]">{abouts.length} Biz barada</h1>
-          <Pagination
-            meta={null}
-            pages={[]}
-            pageNo={filter.page}
-            length={abouts.length}
-            next={() => setFilter({ ...filter, page: filter.page + 1 })}
-            prev={() => setFilter({ ...filter, page: filter.page - 1 })}
-            goTo={(item) => setFilter({ ...filter, page: item })}
-          />
-        </div>
-
-        {/* Delete Confirm Modal */}
+        {/* Delete Modal */}
         <Modal
           open={isDelete}
           onClose={() => setIsDelete(false)}
@@ -225,7 +199,6 @@ const About = () => {
           }}
         >
           <Sheet
-            variant="outlined"
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
@@ -260,7 +233,7 @@ const About = () => {
                   Goýbolsun et
                 </button>
                 <button
-                  onClick={handleConfirmDelete}
+                  onClick={handleDestroy}
                   className="text-[14px] font-[500] text-white hover:bg-[#fd6060] bg-[#FF4D4D] rounded-[8px] px-6 py-3"
                 >
                   Aýyr

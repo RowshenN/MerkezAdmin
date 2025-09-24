@@ -38,8 +38,8 @@ const AboutCreate = () => {
           <div className="border-l-[3px] border-blue h-[20px]"></div>
           <h1 className="text-[20px] font-[500]">Biz barada maglumatlar</h1>
         </div>
-        <div className="flex items-start justify-between py-[15px]">
-          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
+        <div className="flex w-full items-baseline gap-5 flex-col justify-start py-[15px]">
+          <div className="w-full flex items-start justify-center gap-4">
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (türkmen dilinde)</h1>
               <input
@@ -63,21 +63,19 @@ const AboutCreate = () => {
                 className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
-
-            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
-              <h1>Ady (rus dilinde)</h1>
-              <input
-                value={about.name_ru}
-                onChange={(e) =>
-                  setAbout({ ...about, name_ru: e.target.value })
-                }
-                placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
-              />
-            </div>
           </div>
 
-          <div className="w-[49%] flex flex-col items-baseline justify-start gap-4">
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+            <h1>Ady (rus dilinde)</h1>
+            <input
+              value={about.name_ru}
+              onChange={(e) => setAbout({ ...about, name_ru: e.target.value })}
+              placeholder="Ady..."
+              className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+            />
+          </div>
+
+          <div className="w-full flex flex-col items-baseline justify-start gap-4">
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Beýany (türkmen dilinde)</h1>
               <textarea
