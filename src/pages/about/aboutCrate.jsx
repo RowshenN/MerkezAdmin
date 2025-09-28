@@ -16,13 +16,26 @@ const AboutCreate = () => {
   const [createAbout, { isLoading }] = useCreateAboutMutation();
 
   const handleCreate = async () => {
+    const isIncomplete =
+      !about.name_tm ||
+      !about.name_ru ||
+      !about.name_en ||
+      !about.text_tm ||
+      !about.text_ru ||
+      !about.text_en;
+
+    if (isIncomplete) {
+      message.warning("Maglumatlary doly we dogry girizmeli!");
+      return;
+    }
+
     try {
-      await createAbout(about).unwrap(); // creates without invalidating getAll
-      message.success("Üusünlikli döredildi");
-      history.goBack(); // go back to About list without refetch
+      await createAbout(about).unwrap();
+      message.success("Üstünlikli döredildi");
+      history.goBack();
     } catch (err) {
       console.error("Error creating About:", err);
-      message.warning("Üstünlikli döredilmedi");
+      message.error("Üstünlikli döredilmedi");
     }
   };
 

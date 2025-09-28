@@ -33,15 +33,18 @@ const WorksCreate = () => {
   });
 
   const handleSubmit = async () => {
-    if (
+    const isTextIncomplete =
       !work.name_tm ||
       !work.name_ru ||
       !work.name_en ||
       !work.text_tm ||
       !work.text_ru ||
       !work.text_en ||
-      !work.date
-    ) {
+      !work.date;
+
+    const isMediaMissing = !imgFile && !videoFile;
+
+    if (isTextIncomplete || isMediaMissing) {
       setWarning(true);
       return;
     }

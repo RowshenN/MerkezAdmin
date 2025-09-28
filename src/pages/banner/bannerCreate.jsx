@@ -37,7 +37,19 @@ const BannerCreate = () => {
   const [createBanner, { isLoading }] = useCreateBannerMutation();
 
   const handleSubmit = async () => {
-    if (!banner.title_tm || !banner.title_ru || !banner.title_en) {
+    const isTextIncomplete =
+      !banner.title_tm ||
+      !banner.title_ru ||
+      !banner.title_en ||
+      !banner.text_tm ||
+      !banner.text_ru ||
+      !banner.text_en ||
+      !banner.type ||
+      !banner.link;
+
+    const isFileMissing = !file;
+
+    if (isTextIncomplete || isFileMissing) {
       setWarning(true);
       return;
     }
@@ -46,6 +58,7 @@ const BannerCreate = () => {
     Object.entries(banner).forEach(([key, value]) => {
       formData.append(key, value);
     });
+
     if (file) formData.append("img", file);
 
     try {

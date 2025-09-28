@@ -34,15 +34,18 @@ const ServiceCreate = () => {
   const [createService, { isLoading }] = useCreateServiceMutation();
 
   const handleCreate = async () => {
-    if (
+    const isTextIncomplete =
       !product.name_tm ||
       !product.name_ru ||
       !product.name_en ||
       !product.text_tm ||
       !product.text_ru ||
       !product.text_en ||
-      !product.date
-    ) {
+      !product.date;
+
+    const isMediaMissing = !imgFile && !videoFile;
+
+    if (isTextIncomplete || isMediaMissing) {
       setWarning(true);
       return;
     }

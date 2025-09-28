@@ -209,7 +209,7 @@ const Admins = () => {
         {/* Table footer */}
         {selecteds?.length === 0 ? (
           <div className="w-full flex mt-5 justify-between items-center">
-            <h1 className="text-[14px] font-[400]">{users?.length} Admin</h1>
+            {/* <h1 className="text-[14px] font-[400]">{users?.length} Admin</h1> */}
             {users && (
               <Pagination
                 pageNo={filter?.page}

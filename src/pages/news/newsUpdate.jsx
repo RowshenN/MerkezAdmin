@@ -32,7 +32,7 @@ const NewsUpdate = () => {
   });
 
   const [imgFiles, setImgFiles] = useState([]); // old + new images
-  const [videoFile, setVideoFile] = useState(null); // only 1 video
+  const [videoFiles, setVideoFiles] = useState([]); // old + new videos
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +40,6 @@ const NewsUpdate = () => {
   const [updateNews] = useUpdateNewsMutation();
   const [destroyNews] = useDestroyNewsMutation();
 
-  // Load news data
   useEffect(() => {
     if (data) {
       setNews({
@@ -53,7 +52,7 @@ const NewsUpdate = () => {
         date: data.date ? data.date.slice(0, 10) : "",
       });
       setImgFiles(data.Imgs || []);
-      setVideoFile(data.Videos?.[0] || null);
+      setVideoFiles(data.Videos || []); // load all videos
     }
   }, [data]);
 
@@ -62,14 +61,17 @@ const NewsUpdate = () => {
 
   // Handle update
   const handleUpdate = async () => {
-    if (
+    const isIncomplete =
       !news.name_tm ||
       !news.name_ru ||
       !news.name_en ||
       !news.text_tm ||
       !news.text_ru ||
-      !news.text_en
-    ) {
+      !news.text_en ||
+      !news.date ||
+      (!imgFiles.length && !videoFiles.length);
+
+    if (isIncomplete) {
       setWarning(true);
       return;
     }
@@ -82,23 +84,28 @@ const NewsUpdate = () => {
     formData.append("text_tm", news.text_tm);
     formData.append("text_ru", news.text_ru);
     formData.append("text_en", news.text_en);
-    formData.append("date", news.date || "");
+    formData.append("date", news.date);
 
     // Append new images
     imgFiles.forEach((file) => {
       if (file instanceof File) formData.append("img", file);
     });
 
-    // Append video if it's a new file
-    if (videoFile instanceof File) formData.append("video", videoFile);
+    // Append new videos
+    videoFiles.forEach((file) => {
+      if (file instanceof File) formData.append("video", file);
+    });
 
-    // Send IDs of old images/videos to keep
+    // Keep IDs of old images
     const keptImgIds = imgFiles
       .filter((f) => !(f instanceof File))
       .map((f) => f.id);
-    const keptVideoIds =
-      videoFile && !(videoFile instanceof File) ? [videoFile.id] : [];
     formData.append("keptImgIds", JSON.stringify(keptImgIds));
+
+    // Keep IDs of old videos
+    const keptVideoIds = videoFiles
+      .filter((f) => !(f instanceof File))
+      .map((f) => f.id);
     formData.append("keptVideoIds", JSON.stringify(keptVideoIds));
 
     setLoading(true);
@@ -205,43 +212,45 @@ const NewsUpdate = () => {
           <div className="w-[49%]">
             <h1 className="text-[16px] font-[500]">Wideo</h1>
             <div className="flex gap-5 mt-5 flex-wrap">
-              {videoFile && (
-                <div className="relative w-[75px] h-[75px]">
+              {videoFiles.map((file, index) => (
+                <div key={index} className="relative w-[75px] h-[75px]">
                   <video
                     src={
-                      videoFile instanceof File
-                        ? URL.createObjectURL(videoFile)
-                        : videoFile.src
+                      file instanceof File
+                        ? URL.createObjectURL(file)
+                        : file.src
                         ? `${
                             process.env.REACT_APP_BASE_URL
-                          }uploads/news/${videoFile.src.split("\\").pop()}`
+                          }uploads/news/${file.src.split("\\").pop()}`
                         : ""
                     }
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
                     controls
                   />
                   <div
-                    onClick={() => setVideoFile(null)}
+                    onClick={() =>
+                      setVideoFiles(videoFiles.filter((_, i) => i !== index))
+                    }
                     className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
                   >
                     ✕
                   </div>
                 </div>
-              )}
+              ))}
 
-              {!videoFile && (
-                <div
-                  onClick={() => videoRef.current.click()}
-                  className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
-                >
-                  + Wideo goş
-                </div>
-              )}
+              <div
+                onClick={() => videoRef.current.click()}
+                className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+              >
+                + Wideo goş
+              </div>
               <input
                 ref={videoRef}
                 type="file"
                 className="hidden"
-                onChange={(e) => setVideoFile(e.target.files[0])}
+                onChange={(e) =>
+                  setVideoFiles([...videoFiles, e.target.files[0]])
+                }
               />
             </div>
           </div>

@@ -1,15 +1,11 @@
-import React from "react";
+import { Flex, Spin } from "antd";
 
-import lang from "../lang/home.json";
 const PageLoading = () => {
   return (
-    <div className="w-full min-h-[100vh] text-[24px] gap-3 fon-[700] text-blue-logo  flex items-center justify-center">
-      {/* <img
-        src={logo}
-        className="h-[30px] animate-spin  object-contain"
-        alt=""
-      /> */}
-      Loading...
+    <div className="h-[90vh] w-full flex items-center justify-center ">
+      <Flex align="center" gap="middle">
+        <Spin size="large" />
+      </Flex>
     </div>
   );
 };

@@ -34,15 +34,18 @@ const NewsCreate = () => {
   const [createNews, { isLoading }] = useCreateNewsMutation();
 
   const handleSubmit = async () => {
-    if (
+    const isTextIncomplete =
       !news.name_tm ||
       !news.name_ru ||
       !news.name_en ||
       !news.text_tm ||
       !news.text_ru ||
       !news.text_en ||
-      !news.date
-    ) {
+      !news.date;
+
+    const isMediaMissing = !imgFile && !videoFile;
+
+    if (isTextIncomplete || isMediaMissing) {
       setWarning(true);
       return;
     }
