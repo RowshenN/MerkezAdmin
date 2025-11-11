@@ -1,26 +1,26 @@
-// pages/news/NewsUpdate.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Alert from "@mui/joy/Alert";
-import IconButton from "@mui/joy/IconButton";
-import Typography from "@mui/joy/Typography";
+import { IconButton, Typography } from "@mui/joy";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import WarningIcon from "@mui/icons-material/Warning";
-import { Button, Popconfirm, message } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import Modal from "@mui/joy/Modal";
+import Sheet from "@mui/joy/Sheet";
 import PageLoading from "../../components/PageLoading";
+import { useHistory } from "react-router-dom";
+import { message } from "antd";
 
-import {
-  useGetNewsQuery,
-  useUpdateNewsMutation,
-  useDestroyNewsMutation,
-} from "../../services/news";
+import { useCreateMyShopMutation } from "../../services/shop";
 
-const NewsUpdate = () => {
+const NewsCreate = () => {
   const history = useHistory();
-  const { id } = useParams();
   const imgRef = useRef(null);
   const videoRef = useRef(null);
 
+  const [imgFile, setImgFile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [bigPostPicture, setBigPostPicture] = useState(null);
+  const fileRef = useRef(null);
+  const [warning, setWarning] = useState(false);
   const [news, setNews] = useState({
     name_tm: "",
     name_ru: "",
@@ -31,53 +31,26 @@ const NewsUpdate = () => {
     date: "",
   });
 
-  const [imgFiles, setImgFiles] = useState([]); // old + new images
-  const [videoFiles, setVideoFiles] = useState([]); // old + new videos
-  const [warning, setWarning] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [createNews, { isLoading }] = useCreateMyShopMutation();
 
-  const { data, isLoading, error } = useGetNewsQuery(id);
-  const [updateNews] = useUpdateNewsMutation();
-  const [destroyNews] = useDestroyNewsMutation();
-
-  useEffect(() => {
-    if (data) {
-      setNews({
-        name_tm: data.name_tm || "",
-        name_ru: data.name_ru || "",
-        name_en: data.name_en || "",
-        text_tm: data.text_tm || "",
-        text_ru: data.text_ru || "",
-        text_en: data.text_en || "",
-        date: data.date ? data.date.slice(0, 10) : "",
-      });
-      setImgFiles(data.Imgs || []);
-      setVideoFiles(data.Videos || []); // load all videos
-    }
-  }, [data]);
-
-  if (isLoading) return <PageLoading />;
-  if (error) return <div>Ýalňyşlyk boldy</div>;
-
-  // Handle update
-  const handleUpdate = async () => {
-    const isIncomplete =
+  const handleSubmit = async () => {
+    const isTextIncomplete =
       !news.name_tm ||
       !news.name_ru ||
       !news.name_en ||
       !news.text_tm ||
       !news.text_ru ||
       !news.text_en ||
-      !news.date ||
-      (!imgFiles.length && !videoFiles.length);
+      !news.date;
 
-    if (isIncomplete) {
+    const isMediaMissing = !imgFile && !videoFile;
+
+    if (isTextIncomplete || isMediaMissing) {
       setWarning(true);
       return;
     }
 
     const formData = new FormData();
-    formData.append("id", id);
     formData.append("name_tm", news.name_tm);
     formData.append("name_ru", news.name_ru);
     formData.append("name_en", news.name_en);
@@ -86,58 +59,36 @@ const NewsUpdate = () => {
     formData.append("text_en", news.text_en);
     formData.append("date", news.date);
 
-    // Append new images
-    imgFiles.forEach((file) => {
-      if (file instanceof File) formData.append("img", file);
-    });
+    if (imgFile) formData.append("img", imgFile);
+    if (videoFile) formData.append("video", videoFile);
 
-    // Append new videos
-    videoFiles.forEach((file) => {
-      if (file instanceof File) formData.append("video", file);
-    });
-
-    // Keep IDs of old images
-    const keptImgIds = imgFiles
-      .filter((f) => !(f instanceof File))
-      .map((f) => f.id);
-    formData.append("keptImgIds", JSON.stringify(keptImgIds));
-
-    // Keep IDs of old videos
-    const keptVideoIds = videoFiles
-      .filter((f) => !(f instanceof File))
-      .map((f) => f.id);
-    formData.append("keptVideoIds", JSON.stringify(keptVideoIds));
-
-    setLoading(true);
     try {
-      await updateNews(formData).unwrap();
-      message.success("Täzelik üstünlikli üýtgedildi");
-      history.goBack();
-    } catch (err) {
-      console.error(err);
-      message.warning("Üýtgetmek başartmady!");
-    } finally {
-      setLoading(false);
+      await createNews(formData).unwrap();
+      message.success("Täzelik üstünlikli döredildi");
+      history.push("/news");
+    } catch (error) {
+      console.error("Error creating news:", error);
+      message.error("Maglumatlary barlaň");
     }
   };
 
-  return loading ? (
-    <PageLoading />
-  ) : (
+  if (isLoading) return <PageLoading />;
+
+  return (
     <div className="w-full">
-      {/* Alert */}
       {warning && (
         <Alert
           className="!fixed z-50 top-5 right-5"
+          key={"title"}
           sx={{ alignItems: "flex-start" }}
           startDecorator={<WarningIcon />}
           variant="soft"
-          color="warning"
+          color={"warning"}
           endDecorator={
             <IconButton
               onClick={() => setWarning(false)}
               variant="soft"
-              color="warning"
+              color={"warning"}
             >
               <CloseRoundedIcon />
             </IconButton>
@@ -145,7 +96,7 @@ const NewsUpdate = () => {
         >
           <div>
             <div>{"Maglumat nädogry!"}</div>
-            <Typography level="body-sm" color="warning">
+            <Typography level="body-sm" color={"warning"}>
               Maglumatlary doly we dogry girizmeli!
             </Typography>
           </div>
@@ -154,111 +105,95 @@ const NewsUpdate = () => {
 
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Täzelik</h1>
+        <h1 className="text-[30px] font-[700]">Sargytlar</h1>
       </div>
 
+      {/* Form */}
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
-        {/* Media Upload */}
         <div className="flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
           <div className="border-l-[3px] border-blue h-[20px]"></div>
-          <h1 className="text-[20px] font-[500]">Täzelik media</h1>
+          <h1 className="text-[20px] font-[500]">Sargydyň maglumaty</h1>
         </div>
+        {/* Image & Video Upload */}
         <div className="flex items-start justify-between py-[30px] gap-4">
-          {/* Images */}
+          {/* Image Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Suratlar</h1>
+            <h1 className="text-[16px] font-[500]">Sargytlar suratlary</h1>
             <div className="flex gap-5 mt-5 flex-wrap">
-              {imgFiles.map((file, index) => (
-                <div key={index} className="relative w-[75px] h-[75px]">
+              {imgFile && (
+                <div className="relative w-[75px] h-[75px]">
                   <img
-                    src={
-                      file instanceof File
-                        ? URL.createObjectURL(file)
-                        : file.src
-                        ? `${process.env.REACT_APP_BASE_URL}./${file.src
-                            .split("\\")
-                            .pop()}`
-                        : ""
-                    }
+                    src={URL.createObjectURL(imgFile)}
+                    alt={imgFile.name}
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
                   />
                   <div
-                    onClick={() =>
-                      setImgFiles(imgFiles.filter((_, i) => i !== index))
-                    }
+                    onClick={() => setImgFile(null)}
                     className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
                   >
                     ✕
                   </div>
                 </div>
-              ))}
+              )}
 
-              <div
-                onClick={() => imgRef.current.click()}
-                className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
-              >
-                + Surat goş
-              </div>
+              {!imgFile && (
+                <div
+                  onClick={() => (videoFile ? null : imgRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                >
+                  + Surat goş
+                </div>
+              )}
               <input
                 ref={imgRef}
                 type="file"
                 className="hidden"
-                onChange={(e) => setImgFiles([...imgFiles, e.target.files[0]])}
+                onChange={(e) => setImgFile(e.target.files[0])}
               />
             </div>
           </div>
 
-          {/* Video */}
+          {/* Video Upload */}
           <div className="w-[49%]">
-            <h1 className="text-[16px] font-[500]">Wideo</h1>
+            <h1 className="text-[16px] font-[500]">Täzelik wideosy</h1>
             <div className="flex gap-5 mt-5 flex-wrap">
-              {videoFiles.map((file, index) => (
-                <div key={index} className="relative w-[75px] h-[75px]">
+              {videoFile && (
+                <div className="relative w-[75px] h-[75px]">
                   <video
-                    src={
-                      file instanceof File
-                        ? URL.createObjectURL(file)
-                        : file.src
-                        ? `${
-                            process.env.REACT_APP_BASE_URL
-                          }uploads/news/${file.src.split("\\").pop()}`
-                        : ""
-                    }
+                    src={URL.createObjectURL(videoFile)}
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
                     controls
                   />
                   <div
-                    onClick={() =>
-                      setVideoFiles(videoFiles.filter((_, i) => i !== index))
-                    }
+                    onClick={() => setVideoFile(null)}
                     className="absolute -top-2 -right-2 cursor-pointer bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center"
                   >
                     ✕
                   </div>
                 </div>
-              ))}
+              )}
 
-              <div
-                onClick={() => videoRef.current.click()}
-                className="border-[2px] border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
-              >
-                + Wideo goş
-              </div>
+              {!videoFile && (
+                <div
+                  onClick={() => (imgFile ? null : videoRef.current.click())}
+                  className="border-[2px] w-full border-dashed border-[#98A2B2] p-5 rounded-[6px] cursor-pointer"
+                >
+                  + Wideo goş
+                </div>
+              )}
               <input
                 ref={videoRef}
                 type="file"
                 className="hidden"
-                onChange={(e) =>
-                  setVideoFiles([...videoFiles, e.target.files[0]])
-                }
+                onChange={(e) => setVideoFile(e.target.files[0])}
               />
             </div>
           </div>
         </div>
 
-        {/* News Text */}
-        <div className="flex items-start justify-between py-[15px] gap-5">
-          <div className="w-[49%] flex flex-col gap-4">
+        {/* Input fields */}
+        <div className="flex items-start justify-between pt-7">
+          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (türkmen dilinde)</h1>
               <input
@@ -279,7 +214,7 @@ const NewsUpdate = () => {
               />
             </div>
           </div>
-          <div className="w-[49%] flex flex-col gap-4">
+          <div className="w-[49%] flex flex-col items-start justify-start gap-4">
             <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (iňlis dilinde)</h1>
               <input
@@ -301,8 +236,7 @@ const NewsUpdate = () => {
             </div>
           </div>
         </div>
-
-        <div className="w-full mt-4 flex flex-col gap-4">
+        <div className="w-full mt-4 flex flex-col items-baseline justify-start gap-4">
           <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
             <h1>Beýany (türkmen dilinde)</h1>
             <textarea
@@ -333,37 +267,11 @@ const NewsUpdate = () => {
             />
           </div>
         </div>
-
-        {/* Delete */}
-        <div className="flex items-center justify-between py-[30px] border-t-[1px]">
-          <div className="w-[380px]">
-            <h1 className="text-[18px] font-[500]">Täzeligi poz</h1>
-          </div>
-          <div className="flex justify-start w-[550px]">
-            <Popconfirm
-              title="Täzeligi pozmak!"
-              description="Siz çyndan pozmak isleýärsiňizmi?"
-              onConfirm={async () => {
-                try {
-                  await destroyNews(id).unwrap();
-                  message.success("Täzelik pozuldy");
-                  history.goBack();
-                } catch (err) {
-                  message.warning("Pozmak başartmady!");
-                }
-              }}
-              okText="Hawa"
-              cancelText="Ýok"
-            >
-              <Button danger>Pozmak</Button>
-            </Popconfirm>
-          </div>
-        </div>
       </div>
 
       {/* Footer */}
       <div className="sticky bottom-0 py-2 bg-[#F7F8FA] w-full">
-        <div className="w-full mt-5 flex justify-end gap-4 bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
+        <div className="w-full mt-4 flex justify-end gap-5 items-center bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
           <button
             onClick={() => history.goBack()}
             className="text-blue text-[14px] font-[500] py-[11px] px-[27px] hover:bg-red hover:text-white rounded-[8px]"
@@ -371,15 +279,41 @@ const NewsUpdate = () => {
             Goýbolsun et
           </button>
           <button
-            onClick={handleUpdate}
+            onClick={handleSubmit}
             className="text-white text-[14px] font-[500] py-[11px] px-[27px] bg-blue rounded-[8px] hover:bg-opacity-90"
           >
             Ýatda sakla
           </button>
         </div>
       </div>
+
+      {/* Big image modal */}
+      <Modal
+        open={bigPostPicture != null}
+        onClose={() => setBigPostPicture(null)}
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
+        <Sheet
+          variant="outlined"
+          sx={{
+            maxWidth: 600,
+            width: "50%",
+            borderRadius: "md",
+            p: 3,
+            boxShadow: "lg",
+          }}
+        >
+          <div className="w-full flex justify-center items-center">
+            <img
+              className="w-[50%] object-contain"
+              src={bigPostPicture}
+              alt=""
+            />
+          </div>
+        </Sheet>
+      </Modal>
     </div>
   );
 };
 
-export default React.memo(NewsUpdate);
+export default React.memo(NewsCreate);

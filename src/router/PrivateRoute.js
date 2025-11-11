@@ -2,11 +2,9 @@ import React, { Suspense } from "react";
 import { Route, useHistory } from "react-router-dom";
 import { isLogin } from "../utils/index";
 import PageLoading from "../components/PageLoading";
-import { Home } from "../pages/index";
 import Sidebar from "../components/sidebar";
 
 const Headers = React.lazy(() => import("../components/Header"));
-const Footer = React.lazy(() => import("../components/Footer"));
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const history = useHistory();

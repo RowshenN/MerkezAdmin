@@ -1,3 +1,4 @@
+// services/banner.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { token } from "../utils/token";
 
@@ -18,45 +19,42 @@ export const bannerApi = createApi({
   tagTypes: ["Banner"],
 
   endpoints: (builder) => ({
-    // Get all banners
+    // 🔹 Get all banners (public)
     getAllBanners: builder.query({
-      query: (params) => {
-        const query = new URLSearchParams(params).toString();
-        return `api/banner/all?${query}`;
-      },
+      query: () => `api/banner/`,
       providesTags: ["Banner"],
     }),
 
-    // Get one banner
-    getBanner: builder.query({
+    // 🔹 Get one banner by ID (if needed)
+    getBannerById: builder.query({
       query: (id) => `api/banner/${id}`,
       providesTags: (result, error, id) => [{ type: "Banner", id }],
     }),
 
-    // Create a banner
+    // 🔹 Create banner (superadmin)
     createBanner: builder.mutation({
       query: (formData) => ({
-        url: `api/banner/create`,
+        url: `api/banner/`,
         method: "POST",
-        body: formData,
+        body: formData, // formData because of image upload
       }),
       invalidatesTags: ["Banner"],
     }),
 
-    // Update a banner
+    // 🔹 Update banner (superadmin)
     updateBanner: builder.mutation({
-      query: (formData) => ({
-        url: `api/banner/update`,
-        method: "PATCH",
+      query: ({ id, formData }) => ({
+        url: `api/banner/${id}`,
+        method: "PUT",
         body: formData,
       }),
       invalidatesTags: ["Banner"],
     }),
 
-    // Destroy a banner
-    destroyBanner: builder.mutation({
+    // 🔹 Delete banner (superadmin)
+    deleteBanner: builder.mutation({
       query: (id) => ({
-        url: `api/banner/destroy/${id}`,
+        url: `api/banner/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Banner"],
@@ -66,8 +64,8 @@ export const bannerApi = createApi({
 
 export const {
   useGetAllBannersQuery,
-  useGetBannerQuery,
+  useGetBannerByIdQuery,
   useCreateBannerMutation,
   useUpdateBannerMutation,
-  useDestroyBannerMutation,
+  useDeleteBannerMutation,
 } = bannerApi;

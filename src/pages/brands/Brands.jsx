@@ -10,69 +10,66 @@ import PageLoading from "../../components/PageLoading";
 import { message } from "antd";
 
 import {
-  useGetAllWorksQuery,
-  useDestroyWorkMutation,
-} from "../../services/works";
+  useGetBrandsQuery,
+  useDeleteBrandMutation,
+} from "../../services/brand";
+import Pagination from "../../components/pagination";
 
-const Works = () => {
+const Brands = () => {
   const path = useLocation();
   const history = useHistory();
 
   const [filter, setFilter] = useState({
     name: "",
     order: "default",
-    deleted: "false",
+    isActive: "",
   });
+  const [page, setPage] = useState(1);
+  const [limit] = useState(50);
+
   const [isDelete, setISDelete] = useState(false);
-  const [identifier, setIdentifier] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
 
   const mappedFilter = {
     ...filter,
-    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
-    deleted:
-      filter.deleted === "true"
-        ? true
-        : filter.deleted === "false"
-        ? false
-        : "",
+    order:
+      filter.order === "asc" || filter.order === "default" ? "asc" : "desc",
+    isActive: filter.isActive === "" ? undefined : filter.isActive,
+    page,
+    limit,
   };
 
-  const {
-    data: rawWorks = [],
-    isLoading,
-    refetch,
-  } = useGetAllWorksQuery(mappedFilter, {
+  const { data, isLoading, refetch } = useGetBrandsQuery(mappedFilter, {
     refetchOnMountOrArgChange: true,
   });
 
-  const works = Array.isArray(rawWorks)
-    ? [...rawWorks].reverse()
-    : rawWorks?.data || [];
-
-  const [destroyWork] = useDestroyWorkMutation();
+  const [deleteBrand] = useDeleteBrandMutation();
 
   const handleDestroy = async () => {
     try {
-      await destroyWork(identifier).unwrap();
-      message.success("Iş üstünlikli pozuldy");
+      await deleteBrand(selectedBrand.id).unwrap();
+      message.success("Brand deleted successfully");
       setISDelete(false);
       refetch();
-    } catch (error) {
-      console.error(error);
-      message.error("Iş pozulmady");
+    } catch (err) {
+      console.error(err);
+      message.error("Brand deletion failed");
     }
   };
 
   if (isLoading) return <PageLoading />;
 
+  const brands = data?.brands || [];
+  const meta = data?.meta || {};
+
   return (
     <div className="w-full">
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Işler</h1>
+        <h1 className="text-[30px] font-[700]">Markalar</h1>
         <div className="w-fit flex gap-5">
           <Select
-            placeholder="Hemmesini görkez"
+            placeholder="Sort"
             onChange={(e, value) => setFilter({ ...filter, order: value })}
             value={filter.order}
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
@@ -86,15 +83,15 @@ const Works = () => {
               },
             }}
           >
-            <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z)</Option>
-            <Option value="desc">Adyna görä (Z-A)</Option>
+            <Option value="default">Default</Option>
+            <Option value="asc">A-Z</Option>
+            <Option value="desc">Z-A</Option>
           </Select>
 
           <Select
-            placeholder="Hemmesini görkez"
-            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
-            value={filter.deleted}
+            placeholder="Status"
+            onChange={(e, value) => setFilter({ ...filter, isActive: value })}
+            value={filter.isActive}
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
             indicator={<KeyboardArrowDown className="!text-[16px]" />}
             sx={{
@@ -106,13 +103,13 @@ const Works = () => {
               },
             }}
           >
-            <Option value="">Hemmesini görkez</Option>
-            <Option value="false">Aktiw</Option>
-            <Option value="true">Aktiw däl</Option>
+            <Option value="">All</Option>
+            <Option value="true">Active</Option>
+            <Option value="false">Inactive</Option>
           </Select>
 
           <Button
-            onClick={() => history.push({ pathname: "/works/create" })}
+            onClick={() => history.push({ pathname: "/brands/create" })}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
             startDecorator={<Add />}
           >
@@ -127,102 +124,82 @@ const Works = () => {
         <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
           <input
             type="text"
-            placeholder="Gözleg"
+            placeholder="Search"
             value={filter.name}
             onChange={(e) => setFilter({ ...filter, name: e.target.value })}
             className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
           />
         </div>
-
         {/* Table Header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
-            Media
+            Logo
           </h1>
           <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
             Ady
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[47%] whitespace-nowrap uppercase">
-            Text
+          <h1 className="text-[14px] font-[500] w-[37%] whitespace-nowrap text-[#98A2B2] uppercase">
+            Beýany
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[8%] text-center uppercase">
-            Senesi
+          <h1 className="text-[14px] text-[#98A2B2] uppercase text-center font-[500] w-[20%]">
+            Kategoriya
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
-            Status
+          <h1 className="text-[14px] flex items-center justify-center text-[#98A2B2] uppercase font-[500] w-[20%]">
+            <span className="px-4 py-2 rounded-[12px] text-[13px] font-[600]">
+              Status
+            </span>
+          </h1>
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[15%] text-center uppercase">
+            Hereketler
           </h1>
         </div>
 
         {/* Table Body */}
-        {Array.isArray(works) ? (
-          works.map((item, i) => (
-            <div
-              key={"work" + i}
-              className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
-            >
+        {brands.map((brand, i) => (
+          <div
+            key={i}
+            className="w-full gap-[20px] flex flex-col px-4 py-3 rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
+          >
+            <div className="flex items-center gap-[20px]">
               <div className="w-[8%] min-w-[45px] flex gap-1">
                 <div className="relative w-[40px] h-[40px]">
-                  {item?.Imgs?.length > 0 ? (
-                    <img
-                      src={`${
-                        process.env.REACT_APP_BASE_URL
-                      }./${item.Imgs[0].src.split("\\").pop()}`}
-                      alt={item?.Imgs[0]?.name || "work"}
-                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                    />
-                  ) : item?.Videos?.length > 0 ? (
-                    <video
-                      src={`${
-                        process.env.REACT_APP_BASE_URL
-                      }${item.Videos[0].src.split("\\").pop()}`}
-                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                      controls={false}
-                    />
-                  ) : (
-                    <img
-                      src="/placeholder.png"
-                      alt="placeholder"
-                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                    />
-                  )}
-
-                  {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
-                    <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
-                      Video
-                    </span>
-                  )}
+                  <img
+                    src={
+                      brand.logo
+                        ? `${
+                            process.env.REACT_APP_BASE_URL
+                          }${brand.logo.replace("\\", "/")}`
+                        : "/placeholder.png"
+                    }
+                    alt={brand.name}
+                    className="object-cover w-[40px] h-[40px] rounded-[4px]"
+                  />
                 </div>
               </div>
-
-              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[25%]">
-                {item?.name_tm}
+              <h1 className="text-[14px] line-clamp-1 font-[500] text-black w-[25%]">
+                {brand.name}
               </h1>
-              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[45%]">
-                {item?.text_tm}
+              <h1 className="text-[14px] line-clamp-1 font-[500] text-black w-[37%]">
+                {brand.description}
               </h1>
-
-              <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
-                {item?.date
-                  ? new Date(item.date).toLocaleDateString("en-GB")
-                  : "-"}
+              <h1 className="text-[14px] text-center font-[500] text-black w-[20%]">
+                {brand?.category?.name || "-"}
               </h1>
-
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
-                <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    item?.deleted
-                      ? "text-[#E9B500] bg-[#E9B500]"
-                      : "text-[#44CE62] bg-[#44CE62]"
+              <h1 className="text-[14px] flex items-center justify-center font-[500] w-[20%]">
+                <span
+                  className={`px-4 py-2 rounded-[12px] text-[13px] font-[600] ${
+                    brand.isActive
+                      ? "bg-[#44CE62] text-white"
+                      : "bg-[#E91F00] text-white"
                   }`}
                 >
-                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
-                </div>
-
-                <div
-                  onClick={() =>
-                    history.push({ pathname: path?.pathname + "/" + item?.id })
-                  }
-                  className="cursor-pointer p-2"
+                  {brand.isActive ? "Active" : "Disabled"}
+                </span>
+              </h1>
+              <div className="text-[14px] flex items-center justify-center gap-2 w-[15%]">
+                <Button
+                  onClick={() => history.push(path.pathname + "/" + brand.id)}
+                  className="!text-black !hover:bg-[#F7F8FA] !bg-white !rounded-[6px] !px-2 !py-1"
                 >
                   <svg
                     width="3"
@@ -235,14 +212,13 @@ const Works = () => {
                     <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
                     <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
                   </svg>
-                </div>
-
-                {/* <div
+                </Button>
+                <Button
                   onClick={() => {
+                    setSelectedBrand(brand);
                     setISDelete(true);
-                    setIdentifier(item.id);
                   }}
-                  className="cursor-pointer"
+                  className="!bg-white !rounded-[6px] !px-2 !py-1"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -254,13 +230,34 @@ const Works = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </div> */}
-              </h1>
+                </Button>
+              </div>
             </div>
-          ))
-        ) : (
-          <div>Ýok</div>
-        )}
+
+            {/* Shops list */}
+            {/* {brand.shops?.length > 0 && (
+              <div className="ml-[8%] mt-2 text-[13px] text-gray-700">
+                Shops: {brand.shops.map((s) => s.name).join(", ")}
+              </div>
+            )} */}
+          </div>
+        ))}
+
+        {/* Pagination */}
+        <div className="mt-4">
+          <Pagination
+            pages={Array.from(
+              { length: meta.totalPages || 1 },
+              (_, i) => i + 1
+            )}
+            meta={meta}
+            goTo={(p) => setPage(p)}
+            prev={() => setPage(page > 1 ? page - 1 : 1)}
+            next={() =>
+              setPage(page < meta.totalPages ? page + 1 : meta.totalPages)
+            }
+          />
+        </div>
 
         {/* Delete Modal */}
         <Modal
@@ -276,41 +273,25 @@ const Works = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Işi aýyrmak</h1>
-              <button onClick={() => setISDelete(false)}>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15 1L1.00006 14.9999M0.999999 0.999943L14.9999 14.9999"
-                    stroke="#B1B1B1"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+              <h1 className="text-[20px] font-[500]">Delete Brand</h1>
+              <button onClick={() => setISDelete(false)}>✕</button>
             </div>
-
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Işi aýyrmak isleýärsiňizmi?
+                Are you sure?
               </h1>
               <div className="flex gap-[29px] justify-center">
                 <button
                   onClick={() => setISDelete(false)}
-                  className="text-[14px] font-[500] px-6 py-3 text-[#98A2B2] rounded-[8px] hover:bg-blue hover:text-white"
+                  className="text-[14px] font-[500] px-6 py-3 text-[#98A2B2] rounded-[8px]"
                 >
-                  Goýbolsun et
+                  Cancel
                 </button>
                 <button
                   onClick={handleDestroy}
                   className="text-[14px] font-[500] text-white hover:bg-[#fd6060] bg-[#FF4D4D] rounded-[8px] px-6 py-3"
                 >
-                  Aýyr
+                  Delete
                 </button>
               </div>
             </div>
@@ -321,4 +302,4 @@ const Works = () => {
   );
 };
 
-export default React.memo(Works);
+export default React.memo(Brands);

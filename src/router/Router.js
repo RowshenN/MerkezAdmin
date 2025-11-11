@@ -3,32 +3,42 @@ import { BrowserRouter, Switch, Route, Routes } from "react-router-dom";
 import PageLoading from "../components/PageLoading";
 
 import {
-  News,
-  NewsCreate,
-  NewsUpdate,
+  Orders,
+  OrdersCreate,
+  OrdersUpdate,
   Login,
   Admins,
   AdminsUpdate,
   AdminsCreate,
-  Contact,
-  ContactUpdate,
-  ContactCreate,
+  Shops,
+  ShopsUpdate,
+  ShopsCreate,
   About,
   AboutCreate,
   AboutUpdate,
   Banner,
   BannerCreate,
   BannerUpdate,
-  Service,
-  ServiceCreate,
-  ServiceUpdate,
-  Works,
-  WorksCreate,
-  WorksUpdate,
-  Subscribes,
-} from "../pages/index";
+  Categories,
+  CategoriesCreate,
+  CategoriesUpdate,
+  Brands,
+  BrandsCreate,
+  BrandsUpdate,
+  Users,
+  Products,
+  ProductsCreate,
+  ProductsUpdate,
+  AttributeUpdate,
+  Attributes,
+  AttributesCreate,
+  BusinessTypes,
+  CreateBusinessTypes,
+  UpdateBusinessTypes,
+} from "../pages/lazy";
 
 import ScrollIntoView from "./ScrollIntoView";
+import Verification from "../pages/login/verification";
 
 const PrivateRoute = lazy(() => import("./PrivateRoute"));
 const App = () => {
@@ -48,43 +58,113 @@ const App = () => {
 
             <PrivateRoute
               restricted={true}
-              component={News}
-              path="/news"
+              component={Verification}
+              path="/verify"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={NewsCreate}
-              path="/news/create"
+              component={Products}
+              path="/products"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={NewsUpdate}
-              path="/news/:id"
+              component={ProductsCreate}
+              path="/products/create"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={Service}
-              path="/service"
+              component={ProductsUpdate}
+              path="/products/:id"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={ServiceCreate}
-              path="/service/create"
+              component={Attributes}
+              path="/attribute"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={ServiceUpdate}
-              path="/service/:id"
+              component={AttributesCreate}
+              path="/attribute/create"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={AttributeUpdate}
+              path="/attribute/:id"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={BusinessTypes}
+              path="/business-type"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={CreateBusinessTypes}
+              path="/business-type/create"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={UpdateBusinessTypes}
+              path="/business-type/:id"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={Orders}
+              path="/orders"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={OrdersCreate}
+              path="/orders/create"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={OrdersUpdate}
+              path="/orders/:id"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={Categories}
+              path="/categories"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={CategoriesCreate}
+              path="/categories/create"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={CategoriesUpdate}
+              path="/categories/:id"
               exact
             />
 
@@ -109,20 +189,22 @@ const App = () => {
 
             <PrivateRoute
               restricted={true}
-              component={Works}
-              path="/works"
+              component={Brands}
+              path="/brands"
               exact
             />
+
             <PrivateRoute
               restricted={true}
-              component={WorksCreate}
-              path="/works/create"
+              component={BrandsCreate}
+              path="/brands/create"
               exact
             />
+
             <PrivateRoute
               restricted={true}
-              component={WorksUpdate}
-              path="/works/:id"
+              component={BrandsUpdate}
+              path="/brands/:id"
               exact
             />
 
@@ -132,6 +214,7 @@ const App = () => {
               path="/banner"
               exact
             />
+
             <PrivateRoute
               restricted={true}
               component={BannerCreate}
@@ -147,27 +230,27 @@ const App = () => {
 
             <PrivateRoute
               restricted={true}
-              component={Subscribes}
-              path="/subscribes"
+              component={Users}
+              path="/users"
               exact
             />
 
             <PrivateRoute
               restricted={true}
-              component={Contact}
-              path="/contact"
+              component={Shops}
+              path="/shops"
               exact
             />
             <PrivateRoute
               restricted={true}
-              component={ContactCreate}
-              path="/contact/create"
+              component={ShopsCreate}
+              path="/shops/create"
               exact
             />
             <PrivateRoute
               restricted={true}
-              component={ContactUpdate}
-              path="/contact/:id"
+              component={ShopsUpdate}
+              path="/shops/:id"
               exact
             />
 

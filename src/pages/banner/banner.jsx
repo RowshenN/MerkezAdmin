@@ -10,8 +10,9 @@ import Pagination from "../../components/pagination";
 import PageLoading from "../../components/PageLoading";
 import {
   useGetAllBannersQuery,
-  useDestroyBannerMutation,
+  useDeleteBannerMutation,
 } from "../../services/banner";
+import { message } from "antd";
 
 const Banner = () => {
   const history = useHistory();
@@ -34,21 +35,31 @@ const Banner = () => {
         : "",
   };
 
-  const { data: rawBanners = [], isLoading } =
-    useGetAllBannersQuery(mappedFilter);
+  const {
+    data: rawBanners = [],
+    isLoading,
+    refetch,
+  } = useGetAllBannersQuery(mappedFilter);
 
   const banners = Array.isArray(rawBanners) ? [...rawBanners].reverse() : [];
 
-  const [destroyBanner] = useDestroyBannerMutation();
-
+  const [destroyBanner] = useDeleteBannerMutation();
   const [isDelete, setIsDelete] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
   const handleConfirmDelete = async () => {
     if (selectedId) {
-      await destroyBanner(selectedId);
-      setIsDelete(false);
-      setSelectedId(null);
+      try {
+        await destroyBanner(selectedId).unwrap();
+        message.success("Banner üstünlikli pozuldy!");
+        refetch();
+      } catch (err) {
+        console.error(err);
+        message.error("Pozmak başartmady!");
+      } finally {
+        setIsDelete(false);
+        setSelectedId(null);
+      }
     }
   };
 
@@ -74,27 +85,8 @@ const Banner = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z) </Option>
-            <Option value="desc">-Adyna görä (Z-A) </Option>
-          </Select>
-          <Select
-            placeholder="Hemmesini görkez"
-            onChange={(e, value) => setFilter({ ...filter, deleted: value })}
-            value={filter.deleted}
-            className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
-            indicator={<KeyboardArrowDown className="!text-[16px]" />}
-            sx={{
-              [`& .${selectClasses.indicator}`]: {
-                transition: "0.2s",
-                [`&.${selectClasses.expanded}`]: {
-                  transform: "rotate(-180deg)",
-                },
-              },
-            }}
-          >
-            <Option value="">Hemmesini görkez</Option>
-            <Option value="false">Aktiw</Option>
-            <Option value="true">Aktiw däl</Option>
+            <Option value="asc">Adyna görä (A-Z)</Option>
+            <Option value="desc">Adyna görä (Z-A)</Option>
           </Select>
 
           <Button
@@ -122,19 +114,20 @@ const Banner = () => {
 
         {/* Table Header */}
         <div className="w-full gap-[10px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[10%] min-w-[60px] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[10%]">
             Surat
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
-            Ady
-          </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[30%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%]">Ady</h1>
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[30%]">
             Text
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[15%] text-center uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%]">
+            Link
+          </h1>
+          <h1 className="text-[14px] flex items-center justify-center text-[#98A2B2] uppercase font-[500] w-[20%]">
             Status
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] text-center uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] text-center">
             Action
           </h1>
         </div>
@@ -146,40 +139,38 @@ const Banner = () => {
           banners.map((item, i) => (
             <div
               key={i}
-              className="w-full gap-[10px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
+              className="w-full gap-[10px] flex items-center px-4 h-[70px] border-b-[1px] border-[#E9EBF0]"
             >
-              <div className="w-[10%] min-w-[60px] flex justify-start">
+              <div className="w-[10%] flex justify-start">
                 <img
-                  src={`${process.env.REACT_APP_BASE_URL}${item?.img
-                    .split("\\")
-                    .pop()}`}
-                  alt={item?.Imgs?.[0]?.name || "work image"}
+                  src={`${process.env.REACT_APP_BASE_URL}${item?.image}`}
+                  alt="banner"
                   className="object-cover w-[40px] h-[40px] rounded-[4px]"
                 />
               </div>
 
-              <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[25%]">
-                {item?.title_tm}
+              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+                {item?.title}
               </h1>
-              <h1 className="text-[14px] font-[500] line-clamp-3 text-black w-[30%]">
-                {item?.text_tm}
+              <h1 className="text-[14px] font-[500] text-black w-[30%] line-clamp-2">
+                {item?.description}
               </h1>
-
-              <h1 className="text-[14px] flex items-center justify-center font-[500] text-[#98A2B2] w-[15%]">
-                <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    !item.deleted
-                      ? "text-[#44CE62] px-[26px] bg-[#44CE62]"
-                      : "text-[#E9B500] bg-[#E9B500]"
+              <h1 className="text-[14px] font-[500] text-black w-[20%] line-clamp-2">
+                {item?.link}
+              </h1>
+              <h1 className="text-[14px] flex items-center justify-center font-[500] w-[20%]">
+                <span
+                  className={`px-4 py-2 rounded-[12px] text-[13px] font-[600] ${
+                    item.isActive
+                      ? "bg-[#44CE62] text-white"
+                      : "bg-[#E91F00] text-white"
                   }`}
                 >
-                  {!item.deleted ? "Active" : "Garaşylýar"}
-                </div>
+                  {item.isActive ? "Active" : "Disabled"}
+                </span>
               </h1>
 
-              {/* Actions */}
               <div className="flex gap-3 items-center w-[20%] justify-center">
-                {/* Three dots */}
                 <div
                   onClick={() => history.push(`/banner/${item?.id}`)}
                   className="cursor-pointer p-2"
@@ -196,14 +187,12 @@ const Banner = () => {
                     <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
                   </svg>
                 </div>
-
-                {/* Red Trash */}
-                {/* <button
+                <Button
                   onClick={() => {
                     setSelectedId(item.id);
                     setIsDelete(true);
                   }}
-                  className="cursor-pointer p-2"
+                  className="!bg-white !rounded-[6px] !px-2 !py-1"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +204,7 @@ const Banner = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </button> */}
+                </Button>
               </div>
             </div>
           ))

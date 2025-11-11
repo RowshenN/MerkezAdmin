@@ -10,11 +10,11 @@ import PageLoading from "../../components/PageLoading";
 import { message } from "antd";
 
 import {
-  useGetAllNewsQuery,
-  useDestroyNewsMutation,
-} from "../../services/news";
+  useGetAllProductsQuery,
+  useDeleteProductMutation,
+} from "../../services/product";
 
-const News = () => {
+const Products = () => {
   const path = useLocation();
   const history = useHistory();
   const [filter, setFilter] = useState({
@@ -22,12 +22,14 @@ const News = () => {
     order: "default",
     deleted: "false",
   });
-  const [isDelete, setISDelete] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
   const [identifier, setIdentifier] = useState(null);
 
+  // 🟢 Convert filter object into query params
   const mappedFilter = {
     ...filter,
-    order: filter.order === "asc" || filter.order === "default" ? 1 : 0,
+    order:
+      filter.order === "asc" || filter.order === "default" ? "asc" : "desc",
     deleted:
       filter.deleted === "true"
         ? true
@@ -36,23 +38,26 @@ const News = () => {
         : "",
   };
 
+  // 🟢 Fetch all products
   const {
-    data: rawNews = [],
+    data: products = [],
     isLoading,
     refetch,
-  } = useGetAllNewsQuery(mappedFilter);
-  const news = Array.isArray(rawNews) ? [...rawNews].reverse() : [];
-  const [destroyNews] = useDestroyNewsMutation();
+  } = useGetAllProductsQuery(mappedFilter);
+
+  const [destroyProduct] = useDeleteProductMutation();
 
   const handleDestroy = async () => {
     try {
-      await destroyNews(identifier).unwrap();
-      message.success("Täzelik üstünlikli pozuldy");
-      setISDelete(false);
+      if (!identifier) return;
+      await destroyProduct(identifier).unwrap();
+      message.success("Haryt üstünlikli pozuldy");
+      setIsDelete(false);
+      setIdentifier(null);
       refetch();
     } catch (error) {
       console.error(error);
-      message.error("Täzelik pozulmady");
+      message.error("Haryt pozulmady");
     }
   };
 
@@ -62,7 +67,7 @@ const News = () => {
     <div className="w-full">
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Täzelikler</h1>
+        <h1 className="text-[30px] font-[700]">Harytlar</h1>
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
@@ -80,9 +85,10 @@ const News = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z) </Option>
-            <Option value="desc">-Adyna görä (Z-A) </Option>
+            <Option value="asc">Adyna görä (A-Z)</Option>
+            <Option value="desc">Adyna görä (Z-A)</Option>
           </Select>
+
           <Select
             placeholder="Hemmesini görkez"
             onChange={(e, value) => setFilter({ ...filter, deleted: value })}
@@ -102,8 +108,9 @@ const News = () => {
             <Option value="false">Aktiw</Option>
             <Option value="true">Aktiw däl</Option>
           </Select>
+
           <Button
-            onClick={() => history.push({ pathname: "/news/create" })}
+            onClick={() => history.push({ pathname: "/products/create" })}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
             startDecorator={<Add />}
           >
@@ -124,49 +131,52 @@ const News = () => {
             className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
           />
         </div>
+
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
+          <h1 className="text-[14px]  font-[500] text-[#98A2B2] w-[7%] min-w-[45px] uppercase">
+            ID
+          </h1>
+          <h1 className="text-[14px]  font-[500] text-[#98A2B2] w-[7%] min-w-[45px] uppercase">
             Media
           </h1>
-          <h1 className="text-[14px] whitespace-nowrap font-[500] text-[#98A2B2] w-[25%] uppercase">
+          <h1 className="text-[14px]  whitespace-nowrap font-[500] text-[#98A2B2] w-[21%] uppercase">
             Ady
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[47%] whitespace-nowrap uppercase">
-            Text
+          <h1 className="text-[14px] font-[500]  text-[#98A2B2] w-[35%] whitespace-nowrap uppercase">
+            Düşündiriş
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[8%] text-center uppercase">
-            Senesi
+          <h1 className="text-[14px]  font-[500] whitespace-nowrap text-[#98A2B2] w-[20%] text-center uppercase">
+            Category
           </h1>
-          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
+          <h1 className="text-[14px]  font-[500] whitespace-nowrap text-[#98A2B2] w-[20%] text-center uppercase">
+            Shop
+          </h1>
+          <h1 className="text-[14px] font-[500] whitespace-nowrap text-[#98A2B2] w-[20%] text-center uppercase">
+            Bahasy
+          </h1>
+          <h1 className="text-[14px]  font-[500] whitespace-nowrap text-[#98A2B2] w-[22%] text-center uppercase">
             Status
           </h1>
         </div>
 
         {/* Table body */}
-        {Array.isArray(news) ? (
-          news.map((item, i) => (
+        {Array.isArray(products) && products.length > 0 ? (
+          products.map((item, i) => (
             <div
-              key={"news" + i}
+              key={"product" + i}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
-              <div className="w-[8%] min-w-[45px] flex gap-1">
-                <div className="relative w-[40px] h-[40px]">
-                  {item?.Imgs?.length > 0 ? (
+              <h1 className="text-[14px]  line-clamp-3 font-[500] text-black w-[7%]">
+                {item?.id}
+              </h1>
+              <div className="w-[7%] flex gap-1">
+                <div className="relative w-full h-[40px]">
+                  {item?.image ? (
                     <img
-                      src={`${
-                        process.env.REACT_APP_BASE_URL
-                      }./${item.Imgs[0].src.split("\\").pop()}`}
-                      alt={item?.Imgs[0]?.name || "news image"}
+                      src={`${process.env.REACT_APP_BASE_URL}${item.image}`}
+                      alt={item?.name || "product image"}
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                    />
-                  ) : item?.Videos?.length > 0 ? (
-                    <video
-                      src={`${
-                        process.env.REACT_APP_BASE_URL
-                      }${item.Videos[0].src.split("\\").pop()}`}
-                      className="object-cover w-[40px] h-[40px] rounded-[4px]"
-                      controls={false}
                     />
                   ) : (
                     <img
@@ -175,38 +185,38 @@ const News = () => {
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
                     />
                   )}
-
-                  {/* Badge for video if no image */}
-                  {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
-                    <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
-                      Video
-                    </span>
-                  )}
                 </div>
               </div>
 
-              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[25%]">
-                {item?.name_tm}
+              <h1 className="text-[14px]  line-clamp-3 font-[500] text-black w-[21%]">
+                {item?.name}
               </h1>
-              <h1 className="text-[14px] line-clamp-3 font-[500] text-black w-[45%]">
-                {item?.text_tm}
+
+              <h1 className="text-[14px]  line-clamp-3 font-[500] text-black w-[35%]">
+                {item?.description || "-"}
               </h1>
 
               <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
-                {item?.date
-                  ? new Date(item.date).toLocaleDateString("en-GB")
-                  : "-"}
+                {item?.category.name}
               </h1>
 
-              <h1 className="text-[14px] flex items-center justify-between gap-2 font-[500] text-[#98A2B2] w-[15%] uppercase">
+              <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
+                {item?.shop.name}
+              </h1>
+
+              <h1 className="text-[14px] font-[500] text-black w-[20%] text-center">
+                {item?.price ? `${item.price} TMT` : "-"}
+              </h1>
+
+              <h1 className="text-[14px] flex items-center justify-center gap-2 font-[500] text-[#98A2B2] w-[22%]">
                 <div
-                  className={`bg-opacity-15 px-4 py-2 w-fit rounded-[12px] ${
-                    item?.deleted
-                      ? "text-[#E9B500] bg-[#E9B500]"
-                      : "text-[#44CE62] bg-[#44CE62]"
+                  className={`bg-opacity-15 whitespace-nowrap py-2 rounded-[12px] ${
+                    item?.isActive
+                      ? "text-white bg-red/70 px-2"
+                      : "text-white bg-green/85 px-4"
                   }`}
                 >
-                  {item?.deleted ? "Aktiw däl" : "Aktiw"}
+                  {item?.isActive ? "Aktiw däl" : "Aktiw"}
                 </div>
 
                 <div
@@ -227,13 +237,12 @@ const News = () => {
                     <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
                   </svg>
                 </div>
-
-                {/* <div
+                <Button
                   onClick={() => {
-                    setISDelete(true);
-                    setIdentifier(item.id);
+                    setIdentifier(item.id); // ✅ set the product id to delete
+                    setIsDelete(true);
                   }}
-                  className="cursor-pointer"
+                  className="!bg-white !rounded-[6px] !px-2 !py-1"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -245,18 +254,18 @@ const News = () => {
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6Z" />
                     <path d="M9 8H11V18H9V8ZM13 8H15V18H13V8Z" />
                   </svg>
-                </div> */}
+                </Button>
               </h1>
             </div>
           ))
         ) : (
-          <div>Ýok</div>
+          <div className="text-center py-10 text-gray-500">Haryt ýok</div>
         )}
 
         {/* Delete modal */}
         <Modal
           open={isDelete}
-          onClose={() => setISDelete(false)}
+          onClose={() => setIsDelete(false)}
           sx={{
             display: "flex",
             justifyContent: "center",
@@ -267,8 +276,8 @@ const News = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Täzeligi aýyrmak</h1>
-              <button onClick={() => setISDelete(false)}>
+              <h1 className="text-[20px] font-[500]">Harydy aýyrmak</h1>
+              <button onClick={() => setIsDelete(false)}>
                 <svg
                   width="16"
                   height="16"
@@ -288,11 +297,11 @@ const News = () => {
 
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Täzeligi aýyrmak isleýärsiňizmi?
+                Harydy aýyrmak isleýärsiňizmi?
               </h1>
               <div className="flex gap-[29px] justify-center">
                 <button
-                  onClick={() => setISDelete(false)}
+                  onClick={() => setIsDelete(false)}
                   className="text-[14px] font-[500] px-6 py-3 text-[#98A2B2] rounded-[8px] hover:bg-blue hover:text-white"
                 >
                   Goýbolsun et
@@ -312,4 +321,4 @@ const News = () => {
   );
 };
 
-export default React.memo(News);
+export default React.memo(Products);

@@ -5,7 +5,7 @@ const BASE_URL = "http://localhost:8080/";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000000,
+  timeout: 10000,
   // withCredentials: false,
   headers: {
     Authorization: "Bearer " + token(),

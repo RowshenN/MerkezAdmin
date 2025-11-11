@@ -62,20 +62,8 @@ const Verification = () => {
       <div className="v-body">
         <section>
           <div className="login-container !h-fit">
-            <h2 className="Title">
-              {dil === "TM"
-                ? tm["Tassyklaýjy kod"]
-                : dil === "RU"
-                ? ru["Tassyklaýjy kod"]
-                : en["Tassyklaýjy kod"]}
-            </h2>
-            <p className="p-1">
-              {dil === "TM"
-                ? tm["Telefon belgiñize tassyklaýjy kody iberdik"]
-                : dil === "RU"
-                ? ru["Telefon belgiñize tassyklaýjy kody iberdik"]
-                : en["Telefon belgiñize tassyklaýjy kody iberdik"]}
-            </p>
+            <h2 className="Title">Tassyklayjy kod</h2>
+            <p className="p-1">Telefon belgiñize tassyklaýjy kody iberdik</p>
             <div className="v-input-box">
               <input
                 autoFocus={true}
@@ -151,11 +139,7 @@ const Verification = () => {
             </div>
             {/* <p style={{ marginTop: "24px", marginBottom: "18px" }}>0:35</p> */}
             <button className="button-1" onClick={() => verify()}>
-              {dil === "TM"
-                ? tm["Dowam etmek"]
-                : dil === "RU"
-                ? ru["Dowam etmek"]
-                : en["Dowam etmek"]}
+              Dowam etmek
             </button>
             <div>
               <p
@@ -163,12 +147,7 @@ const Verification = () => {
                 className="p-3"
                 onClick={() => goBack()}
               >
-                {"<-- "}{" "}
-                {dil === "TM"
-                  ? tm["Yza gaýtmak"]
-                  : dil === "RU"
-                  ? ru["Yza gaýtmak"]
-                  : en["Yza gaýtmak"]}
+                {"<-- "} Yza gaýtmak
               </p>
             </div>
           </div>

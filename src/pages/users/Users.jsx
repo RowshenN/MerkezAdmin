@@ -18,7 +18,7 @@ import {
   useSendToPeopleMutation,
 } from "../../services/subscribes";
 
-const Contact = () => {
+const Users = () => {
   const history = useHistory();
   const { RangePicker } = DatePicker;
 
@@ -122,9 +122,9 @@ const Contact = () => {
     <div className="w-full">
       {/* header section */}
       <div className="w-full pb-[15px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Yzarlaýanlar</h1>
+        <h1 className="text-[30px] font-[700]">Ulanyjylar</h1>
         <div className="w-fit flex gap-5">
-          {/* <Select
+          <Select
             onChange={(e, value) => setFilter({ ...filter, type: value })}
             placeholder="Hemmesini görkez"
             className="!border-[#E9EBF0] !border-[1px] !h-[40px] !bg-white !rounded-[8px] !px-[17px] !w-fit !min-w-[200px] !text-[14px] !text-black"
@@ -158,7 +158,7 @@ const Contact = () => {
                 });
             }}
             format={"DD-MM-YYYY"}
-          /> */}
+          />
 
           {/* Send to All Button */}
           <Button
@@ -191,6 +191,9 @@ const Contact = () => {
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[60%] uppercase">
             E-mail
           </h1>
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[60%] uppercase">
+            Telefon belgisi
+          </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[15%] uppercase">
             Hereketler
           </h1>
@@ -209,6 +212,10 @@ const Contact = () => {
 
               <h1 className="text-[14px] font-[500] text-black w-[55%] ">
                 {item?.email}
+              </h1>
+
+              <h1 className="text-[14px] font-[500] text-black w-[55%] ">
+                {item?.phoneNumber}
               </h1>
 
               <h1 className="text-[14px] flex items-center justify-center gap-5 font-[500] text-[#98A2B2] w-[25%] ">
@@ -278,7 +285,7 @@ const Contact = () => {
         {/* Table footer */}
         <div className="w-full bg-white p-4 rounded-[8px] flex mt-5 justify-between items-center">
           <h1 className="text-[14px] font-[400]">
-            {contactsData?.length} Yzarlaýanlar
+            {contactsData?.length} Ulanyjylar
           </h1>
           <Pagination
             meta={contactsData}
@@ -308,7 +315,7 @@ const Contact = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Yzarlaýany aýyrmak</h1>
+              <h1 className="text-[20px] font-[500]">Ulanyjyny aýyrmak</h1>
               <button onClick={() => setISDelete(false)}>
                 <svg
                   width="16"
@@ -329,13 +336,13 @@ const Contact = () => {
 
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Yzarlaýany aýyrmak isleýärsiňizmi?
+                Ulanyjyny aýyrmak isleýärsiňizmi?
               </h1>
 
               <div className="flex gap-[29px] justify-center">
                 <button
                   onClick={() => setISDelete(false)}
-                  className="text-[14px] font-[500] px-6 py-3 text-[#98A2B2] rounded-[8px] hover:bg-blue hover:text-white"
+                  className="text-[14px] font-[500] px-6 py-3  rounded-[8px] bg-blue text-white"
                 >
                   Goýbolsun et
                 </button>
@@ -343,7 +350,7 @@ const Contact = () => {
                   onClick={handleDelete}
                   className="text-[14px] font-[500] text-white hover:bg-[#fd6060] bg-[#FF4D4D] rounded-[8px] px-6 py-3"
                 >
-                  Aýyr
+                  Pozmak
                 </button>
               </div>
             </div>
@@ -455,4 +462,4 @@ const Contact = () => {
   );
 };
 
-export default React.memo(Contact);
+export default React.memo(Users);

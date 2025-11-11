@@ -10,15 +10,13 @@ import PageLoading from "../../components/PageLoading";
 import { message } from "antd";
 
 import {
-  useGetAllServicesQuery,
-  useDestroyServiceMutation,
-} from "../../services/service";
-import { BASE_URL } from "../../utils/axiosIntance";
+  useGetAllShopsQuery,
+  useDeleteMyShopMutation,
+} from "../../services/shop";
 
-const Service = () => {
+const News = () => {
   const path = useLocation();
   const history = useHistory();
-
   const [filter, setFilter] = useState({
     name: "",
     order: "default",
@@ -39,23 +37,22 @@ const Service = () => {
   };
 
   const {
-    data: rawServices = [],
+    data: rawNews = [],
     isLoading,
     refetch,
-  } = useGetAllServicesQuery(mappedFilter);
-
-  const services = Array.isArray(rawServices) ? [...rawServices].reverse() : [];
-  const [destroyService] = useDestroyServiceMutation();
+  } = useGetAllShopsQuery(mappedFilter);
+  const news = Array.isArray(rawNews) ? [...rawNews].reverse() : [];
+  const [destroyNews] = useDeleteMyShopMutation();
 
   const handleDestroy = async () => {
     try {
-      await destroyService(identifier).unwrap();
-      message.success("Hyzmat üstünlikli pozuldy");
+      await destroyNews(identifier).unwrap();
+      message.success("Täzelik üstünlikli pozuldy");
       setISDelete(false);
       refetch();
     } catch (error) {
       console.error(error);
-      message.error("Hyzmat pozulmady");
+      message.error("Täzelik pozulmady");
     }
   };
 
@@ -65,7 +62,7 @@ const Service = () => {
     <div className="w-full">
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Hyzmatlar</h1>
+        <h1 className="text-[30px] font-[700]">Sargytlar</h1>
         <div className="w-fit flex gap-5">
           <Select
             placeholder="Hemmesini görkez"
@@ -83,8 +80,8 @@ const Service = () => {
             }}
           >
             <Option value="default">Hemmesini görkez</Option>
-            <Option value="asc">Adyna görä (A-Z)</Option>
-            <Option value="desc">Adyna görä (Z-A)</Option>
+            <Option value="asc">Adyna görä (A-Z) </Option>
+            <Option value="desc">-Adyna görä (Z-A) </Option>
           </Select>
           <Select
             placeholder="Hemmesini görkez"
@@ -105,13 +102,13 @@ const Service = () => {
             <Option value="false">Aktiw</Option>
             <Option value="true">Aktiw däl</Option>
           </Select>
-          <Button
-            onClick={() => history.push({ pathname: "/service/create" })}
+          {/* <Button
+            onClick={() => history.push({ pathname: "/orders/create" })}
             className="!h-[40px] !bg-blue !rounded-[8px] !px-[17px] !w-fit !text-[14px] !text-white"
             startDecorator={<Add />}
           >
             Goş
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -127,7 +124,6 @@ const Service = () => {
             className="w-full border-none outline-none h-[38px] pl-4 text-[14px] font-[600] text-black"
           />
         </div>
-
         {/* Table header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[8%] min-w-[45px] uppercase">
@@ -148,23 +144,27 @@ const Service = () => {
         </div>
 
         {/* Table body */}
-        {Array.isArray(services) ? (
-          services.map((item, i) => (
+        {Array.isArray(news) ? (
+          news.map((item, i) => (
             <div
-              key={"service" + i}
+              key={"news" + i}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
               <div className="w-[8%] min-w-[45px] flex gap-1">
                 <div className="relative w-[40px] h-[40px]">
                   {item?.Imgs?.length > 0 ? (
                     <img
-                      src={`${BASE_URL}${item.Imgs[0].src.split("\\").pop()}`}
-                      alt={item?.Imgs[0]?.name || "service image"}
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }./${item.Imgs[0].src.split("\\").pop()}`}
+                      alt={item?.Imgs[0]?.name || "news image"}
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
                     />
                   ) : item?.Videos?.length > 0 ? (
                     <video
-                      src={`${BASE_URL}${item.Videos[0].src.split("\\").pop()}`}
+                      src={`${
+                        process.env.REACT_APP_BASE_URL
+                      }${item.Videos[0].src.split("\\").pop()}`}
                       className="object-cover w-[40px] h-[40px] rounded-[4px]"
                       controls={false}
                     />
@@ -176,6 +176,7 @@ const Service = () => {
                     />
                   )}
 
+                  {/* Badge for video if no image */}
                   {item?.Videos?.length > 0 && item?.Imgs?.length === 0 && (
                     <span className="absolute bottom-0 left-0 text-[10px] px-1 py-[1px] bg-red text-white rounded-tl-[4px]">
                       Video
@@ -227,7 +228,6 @@ const Service = () => {
                   </svg>
                 </div>
 
-                {/* Delete button */}
                 {/* <div
                   onClick={() => {
                     setISDelete(true);
@@ -252,9 +252,64 @@ const Service = () => {
         ) : (
           <div>Ýok</div>
         )}
+
+        {/* Delete modal */}
+        <Modal
+          open={isDelete}
+          onClose={() => setISDelete(false)}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Sheet
+            sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
+          >
+            <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
+              <h1 className="text-[20px] font-[500]">Täzeligi aýyrmak</h1>
+              <button onClick={() => setISDelete(false)}>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15 1L1.00006 14.9999M0.999999 0.999943L14.9999 14.9999"
+                    stroke="#B1B1B1"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div>
+              <h1 className="text-[16px] text-center my-10 font-[400]">
+                Täzeligi aýyrmak isleýärsiňizmi?
+              </h1>
+              <div className="flex gap-[29px] justify-center">
+                <button
+                  onClick={() => setISDelete(false)}
+                  className="text-[14px] font-[500] px-6 py-3 text-[#98A2B2] rounded-[8px] hover:bg-blue hover:text-white"
+                >
+                  Goýbolsun et
+                </button>
+                <button
+                  onClick={handleDestroy}
+                  className="text-[14px] font-[500] text-white hover:bg-[#fd6060] bg-[#FF4D4D] rounded-[8px] px-6 py-3"
+                >
+                  Aýyr
+                </button>
+              </div>
+            </div>
+          </Sheet>
+        </Modal>
       </div>
     </div>
   );
 };
 
-export default React.memo(Service);
+export default React.memo(News);

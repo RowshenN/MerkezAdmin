@@ -11,7 +11,7 @@ const Login = () => {
   const { dil } = useContext(Context);
 
   const [user, setUser] = useState({
-    phone: "",
+    phoneNumber: "",
     password: "",
   });
 
@@ -26,7 +26,7 @@ const Login = () => {
       if (result?.token) {
         localStorage.setItem("userData", JSON.stringify(result));
         message.success("Üstünlikli!");
-        window.open("/contact", "_self"); // or history.push("/home")
+        window.open("/shops", "_self"); // or history.push("/home")
       } else {
         message.warning("Ilki registratsiýa bolmaly!");
         history.push("/signup");
@@ -53,8 +53,10 @@ const Login = () => {
               Ulanyjy telefon belgisi
             </label>
             <input
-              value={user.phone}
-              onChange={(e) => setUser({ ...user, phone: e.target.value })}
+              value={user.phoneNumber}
+              onChange={(e) =>
+                setUser({ ...user, phoneNumber: e.target.value })
+              }
               onKeyDown={(e) => e.key === "Enter" && sign()}
               id="phone"
               className="px-4 text-black text-[16px] font-[400] h-[50px] w-[400px] rounded-[6px] border border-[#98A2B2] outline-none"

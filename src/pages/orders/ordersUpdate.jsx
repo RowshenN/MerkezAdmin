@@ -1,5 +1,5 @@
-// pages/works/WorksUpdate.jsx
-import React, { useRef, useState, useEffect } from "react";
+// pages/news/NewsUpdate.jsx
+import React, { useEffect, useRef, useState } from "react";
 import Alert from "@mui/joy/Alert";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
@@ -10,18 +10,18 @@ import { useHistory, useParams } from "react-router-dom";
 import PageLoading from "../../components/PageLoading";
 
 import {
-  useGetWorkQuery,
-  useUpdateWorkMutation,
-  useDestroyWorkMutation,
-} from "../../services/works";
+  useGetAllShopsQuery,
+  useUpdateMyShopMutation,
+  useDeleteMyShopMutation,
+} from "../../services/shop";
 
-const WorksUpdate = () => {
+const OrdersUpdate = () => {
   const history = useHistory();
   const { id } = useParams();
   const imgRef = useRef(null);
   const videoRef = useRef(null);
 
-  const [work, setWork] = useState({
+  const [news, setNews] = useState({
     name_tm: "",
     name_ru: "",
     name_en: "",
@@ -31,19 +31,18 @@ const WorksUpdate = () => {
     date: "",
   });
 
-  const [imgFiles, setImgFiles] = useState([]); // old + new
-  const [videoFiles, setVideoFiles] = useState([]); // old + new
+  const [imgFiles, setImgFiles] = useState([]); // old + new images
+  const [videoFiles, setVideoFiles] = useState([]); // old + new videos
   const [warning, setWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { data, isLoading, error } = useGetWorkQuery(id);
-  const [updateWork] = useUpdateWorkMutation();
-  const [destroyWork] = useDestroyWorkMutation();
+  const { data, isLoading, error } = useGetAllShopsQuery(id);
+  const [updateNews] = useUpdateMyShopMutation();
+  const [destroyNews] = useDeleteMyShopMutation();
 
-  // Load work data
   useEffect(() => {
     if (data) {
-      setWork({
+      setNews({
         name_tm: data.name_tm || "",
         name_ru: data.name_ru || "",
         name_en: data.name_en || "",
@@ -53,7 +52,7 @@ const WorksUpdate = () => {
         date: data.date ? data.date.slice(0, 10) : "",
       });
       setImgFiles(data.Imgs || []);
-      setVideoFiles(data.Videos || []);
+      setVideoFiles(data.Videos || []); // load all videos
     }
   }, [data]);
 
@@ -62,41 +61,39 @@ const WorksUpdate = () => {
 
   // Handle update
   const handleUpdate = async () => {
-    if (
-      !work.name_tm ||
-      !work.name_ru ||
-      !work.name_en ||
-      !work.text_tm ||
-      !work.text_ru ||
-      !work.text_en ||
-      (!imgFiles.length && !videoFiles.length)
-    ) {
+    const isIncomplete =
+      !news.name_tm ||
+      !news.name_ru ||
+      !news.name_en ||
+      !news.text_tm ||
+      !news.text_ru ||
+      !news.text_en ||
+      !news.date ||
+      (!imgFiles.length && !videoFiles.length);
+
+    if (isIncomplete) {
       setWarning(true);
       return;
     }
 
     const formData = new FormData();
     formData.append("id", id);
-    formData.append("name_tm", work.name_tm);
-    formData.append("name_ru", work.name_ru);
-    formData.append("name_en", work.name_en);
-    formData.append("text_tm", work.text_tm);
-    formData.append("text_ru", work.text_ru);
-    formData.append("text_en", work.text_en);
-    formData.append("date", work.date || "");
+    formData.append("name_tm", news.name_tm);
+    formData.append("name_ru", news.name_ru);
+    formData.append("name_en", news.name_en);
+    formData.append("text_tm", news.text_tm);
+    formData.append("text_ru", news.text_ru);
+    formData.append("text_en", news.text_en);
+    formData.append("date", news.date);
 
     // Append new images
     imgFiles.forEach((file) => {
-      if (file instanceof File) {
-        formData.append("img", file);
-      }
+      if (file instanceof File) formData.append("img", file);
     });
 
     // Append new videos
     videoFiles.forEach((file) => {
-      if (file instanceof File) {
-        formData.append("video", file);
-      }
+      if (file instanceof File) formData.append("video", file);
     });
 
     // Keep IDs of old images
@@ -113,8 +110,8 @@ const WorksUpdate = () => {
 
     setLoading(true);
     try {
-      await updateWork(formData).unwrap();
-      message.success("Iş üstünlikli üýtgedildi");
+      await updateNews(formData).unwrap();
+      message.success("Täzelik üstünlikli üýtgedildi");
       history.goBack();
     } catch (err) {
       console.error(err);
@@ -157,14 +154,14 @@ const WorksUpdate = () => {
 
       {/* Header */}
       <div className="w-full pb-[30px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Işler</h1>
+        <h1 className="text-[30px] font-[700]">Täzelik</h1>
       </div>
 
       <div className="w-full min-h-[60vh] p-5 bg-white rounded-[8px]">
         {/* Media Upload */}
         <div className="flex items-center gap-4 pb-5 border-b-[1px] border-b-[#E9EBF0]">
           <div className="border-l-[3px] border-blue h-[20px]"></div>
-          <h1 className="text-[20px] font-[500]">Işiň media</h1>
+          <h1 className="text-[20px] font-[500]">Täzelik media</h1>
         </div>
         <div className="flex items-start justify-between py-[30px] gap-4">
           {/* Images */}
@@ -222,9 +219,9 @@ const WorksUpdate = () => {
                       file instanceof File
                         ? URL.createObjectURL(file)
                         : file.src
-                        ? `${process.env.REACT_APP_BASE_URL}./${file.src
-                            .split("\\")
-                            .pop()}`
+                        ? `${
+                            process.env.REACT_APP_BASE_URL
+                          }uploads/news/${file.src.split("\\").pop()}`
                         : ""
                     }
                     className="w-[75px] h-[75px] object-cover rounded-[6px]"
@@ -259,93 +256,97 @@ const WorksUpdate = () => {
           </div>
         </div>
 
-        {/* Work Text */}
+        {/* News Text */}
         <div className="flex items-start justify-between py-[15px] gap-5">
           <div className="w-[49%] flex flex-col gap-4">
-            <div className="w-full flex flex-col gap-2">
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (türkmen dilinde)</h1>
               <input
-                value={work.name_tm}
-                onChange={(e) => setWork({ ...work, name_tm: e.target.value })}
+                value={news.name_tm}
+                onChange={(e) => setNews({ ...news, name_tm: e.target.value })}
                 placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
-            <div className="w-full flex flex-col gap-2">
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (rus dilinde)</h1>
               <input
-                value={work.name_ru}
-                onChange={(e) => setWork({ ...work, name_ru: e.target.value })}
+                value={news.name_ru}
+                onChange={(e) => setNews({ ...news, name_ru: e.target.value })}
                 placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>
           <div className="w-[49%] flex flex-col gap-4">
-            <div className="w-full flex flex-col gap-2">
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
               <h1>Ady (iňlis dilinde)</h1>
               <input
-                value={work.name_en}
-                onChange={(e) => setWork({ ...work, name_en: e.target.value })}
+                value={news.name_en}
+                onChange={(e) => setNews({ ...news, name_en: e.target.value })}
                 placeholder="Ady..."
-                className="text-[14px] w-full mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                className="text-[14px] w-full mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
-            <div className="w-full flex flex-col gap-2">
-              <h1>Işiň senesi</h1>
+
+            <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
+              <h1>Täzeligiň senesi</h1>
               <input
-                value={work.date}
-                onChange={(e) => setWork({ ...work, date: e.target.value })}
+                value={news.date}
+                onChange={(e) => setNews({ ...news, date: e.target.value })}
                 type="date"
-                className="border w-full border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+                className="border-[1px] w-full border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
               />
             </div>
           </div>
         </div>
 
         <div className="w-full mt-4 flex flex-col gap-4">
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
             <h1>Beýany (türkmen dilinde)</h1>
             <textarea
-              value={work.text_tm}
-              onChange={(e) => setWork({ ...work, text_tm: e.target.value })}
+              value={news.text_tm}
+              onChange={(e) => setNews({ ...news, text_tm: e.target.value })}
               placeholder="Text..."
-              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
             />
           </div>
-          <div className="w-full flex flex-col gap-2">
+
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
             <h1>Beýany (iňlis dilinde)</h1>
             <textarea
-              value={work.text_en}
-              onChange={(e) => setWork({ ...work, text_en: e.target.value })}
+              value={news.text_en}
+              onChange={(e) => setNews({ ...news, text_en: e.target.value })}
               placeholder="Text..."
-              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
             />
           </div>
-          <div className="w-full flex flex-col gap-2">
+
+          <div className="w-full flex flex-col items-baseline justify-start gap-2 ">
             <h1>Beýany (rus dilinde)</h1>
             <textarea
-              value={work.text_ru}
-              onChange={(e) => setWork({ ...work, text_ru: e.target.value })}
+              value={news.text_ru}
+              onChange={(e) => setNews({ ...news, text_ru: e.target.value })}
               placeholder="Text..."
-              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
+              className="text-[14px] w-full min-h-[100px] mt-1 text-black font-[400] border-[1px] border-[#98A2B2] rounded-[6px] px-5 py-3 outline-none"
             />
           </div>
         </div>
 
         {/* Delete */}
-        <div className="flex items-center justify-between py-[30px] border-t">
+        <div className="flex items-center justify-between py-[30px] border-t-[1px]">
           <div className="w-[380px]">
-            <h1 className="text-[18px] font-[500]">Işi poz</h1>
+            <h1 className="text-[18px] font-[500]">Täzeligi poz</h1>
           </div>
           <div className="flex justify-start w-[550px]">
             <Popconfirm
-              title="Işi pozmak!"
+              title="Täzeligi pozmak!"
               description="Siz çyndan pozmak isleýärsiňizmi?"
               onConfirm={async () => {
                 try {
-                  await destroyWork(id).unwrap();
-                  message.success("Iş pozuldy");
+                  await destroyNews(id).unwrap();
+                  message.success("Täzelik pozuldy");
                   history.goBack();
                 } catch (err) {
                   message.warning("Pozmak başartmady!");
@@ -354,7 +355,7 @@ const WorksUpdate = () => {
               okText="Hawa"
               cancelText="Ýok"
             >
-              <Button danger>Pozmak </Button>
+              <Button danger>Pozmak</Button>
             </Popconfirm>
           </div>
         </div>
@@ -362,7 +363,7 @@ const WorksUpdate = () => {
 
       {/* Footer */}
       <div className="sticky bottom-0 py-2 bg-[#F7F8FA] w-full">
-        <div className="w-full mt-5 flex justify-end gap-4 bg-white py-4 px-5 border border-[#E9EBF0] rounded-[8px]">
+        <div className="w-full mt-5 flex justify-end gap-4 bg-white py-4 px-5 border-[1px] border-[#E9EBF0] rounded-[8px]">
           <button
             onClick={() => history.goBack()}
             className="text-blue text-[14px] font-[500] py-[11px] px-[27px] hover:bg-red hover:text-white rounded-[8px]"
@@ -381,4 +382,4 @@ const WorksUpdate = () => {
   );
 };
 
-export default React.memo(WorksUpdate);
+export default React.memo(OrdersUpdate);

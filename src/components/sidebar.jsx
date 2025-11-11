@@ -41,17 +41,18 @@ export default function Sidebar() {
   const history = useHistory();
   const user = JSON.parse(localStorage.getItem("userData"));
 
-  const checkPermission = (name) => {
-    const array = user?.admin?.permissions?.filter((item) => {
-      return item == name;
-    });
+  // const checkPermission = (name) => {
+  //   const array = user?.admin?.permissions?.filter((item) => {
+  //     return item == name;
+  //   });
 
-    if (array?.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  //   if (array?.length > 0) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
+
   return (
     <Sheet
       className="!p-[0px] !bg-[#F7F8FA]"
@@ -65,7 +66,7 @@ export default function Sidebar() {
         zIndex: 100,
         padding: 0,
         height: "100dvh",
-        width: "300px",
+        width: "250px",
         top: 0,
         p: 2,
         flexShrink: 0,
@@ -80,20 +81,20 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
         className="h-[100px] font-[600] text-[22px] border-b-[1px] border-[#E9EBF0] flex items-center justify-start pl-7"
       >
-        Açyk Asman Ýyldyzy
+        Merkez Bazar
       </div>
 
       <div className="min-h-[70px]   w-[80%] mx-auto border-b-[1px] border-[#E9EBF0] gap-4 font-[600] text-[22px]   flex items-center justify-center">
-        <div className="min-w-[50px] min-h-[50px] rounded-[100%] bg-[#E9EBF0]">
+        {/* <div className="min-w-[50px] min-h-[50px] rounded-[100%] bg-[#E9EBF0]">
           <img
             className="w-[50px] h-[50px] rounded-[100%] bg-[#E9EBF0]"
-            src={user?.admin?.image?.original_url || userDefault}
+            src={user?. || userDefault}
             alt=""
           />
-        </div>
+        </div> */}
         <div className="flex gap-1 flex-wrap w-full">
           <div className="text-[14px] w-full font-[500]">
-            {user?.name != null ? user?.name : ""}
+            {user?.user?.name != null ? user?.user?.name : ""}
           </div>
         </div>
       </div>
@@ -124,58 +125,8 @@ export default function Sidebar() {
         >
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
-              onClick={() => history.push({ pathname: "/contact" })}
-              selected={path.pathname.includes("/contact")}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="16"
-                  rx="2"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-                <circle cx="8" cy="10" r="2" stroke="#3B82F6" strokeWidth="2" />
-                <path
-                  d="M14 8H18"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M14 12H18"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M14 16H18"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-
-              <ListItemContent>
-                <div className="text-[14px] font-[500] text-black">
-                  Habarlaşmak
-                </div>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
-            <ListItemButton
-              onClick={() => history.push({ pathname: "/subscribes" })}
-              selected={path.pathname.includes("/subscribes")}
+              onClick={() => history.push({ pathname: "/users" })}
+              selected={path.pathname.includes("/users")}
             >
               <svg
                 width="24"
@@ -202,7 +153,7 @@ export default function Sidebar() {
 
               <ListItemContent>
                 <div className="text-[14px] font-[500] text-black">
-                  Yzarlaýanlar
+                  Ulanyjylar
                 </div>
               </ListItemContent>
             </ListItemButton>
@@ -210,8 +161,8 @@ export default function Sidebar() {
 
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
-              selected={path.pathname.includes("/news")}
-              onClick={() => history.push({ pathname: "/news" })}
+              onClick={() => history.push({ pathname: "/shops" })}
+              selected={path.pathname.includes("/shops")}
             >
               <svg
                 width="24"
@@ -220,37 +171,158 @@ export default function Sidebar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
+                <path
+                  d="M3 8H21L19 4H5L3 8Z"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect
+                  x="4"
+                  y="8"
+                  width="16"
+                  height="12"
+                  rx="2"
                   stroke="#3B82F6"
                   strokeWidth="2"
                 />
-                <text
+                <rect
+                  x="10"
+                  y="14"
+                  width="4"
+                  height="6"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Dükanlar
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
+              selected={path.pathname.includes("/products")}
+              onClick={() => history.push({ pathname: "/products" })}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="4"
+                  y="6"
+                  width="16"
+                  height="12"
+                  rx="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+
+                <path
+                  d="M4 10H20"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+
+                <rect
+                  x="2"
+                  y="14"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+
+                <rect
+                  x="16"
+                  y="14"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Harytlar
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
+              selected={path.pathname.includes("/orders")}
+              onClick={() => history.push({ pathname: "/orders" })}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="4"
+                  y="8"
+                  width="16"
+                  height="12"
+                  rx="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="6"
+                  y="4"
+                  width="6"
+                  height="4"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <rect
                   x="12"
-                  y="16"
-                  text-anchor="middle"
-                  font-size="6"
-                  fill="#3B82F6"
-                  font-family="Arial, sans-serif"
-                  font-weight="bold"
-                >
-                  NEWS
-                </text>
+                  y="4"
+                  width="6"
+                  height="4"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M4 14H20"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
 
               <ListItemContent>
                 <div className="text-[14px] font-[500] text-black">
-                  Täzelikler
+                  Sargytlar
                 </div>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
-              selected={path.pathname.includes("/service")}
-              onClick={() => history.push({ pathname: "/service" })}
+              selected={path.pathname.includes("/categories")}
+              onClick={() => history.push({ pathname: "/categories" })}
             >
               <svg
                 width="24"
@@ -259,40 +331,57 @@ export default function Sidebar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
+                <rect
+                  x="3"
+                  y="3"
+                  width="8"
+                  height="8"
+                  rx="2"
                   stroke="#3B82F6"
                   strokeWidth="2"
                 />
-                <path
-                  d="M8 10L12 8L16 10L12 12L8 10Z"
+                <rect
+                  x="13"
+                  y="3"
+                  width="8"
+                  height="8"
+                  rx="2"
                   stroke="#3B82F6"
                   strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
-                <path
-                  d="M8 14L12 12L16 14L12 16L8 14Z"
+
+                <rect
+                  x="3"
+                  y="13"
+                  width="8"
+                  height="8"
+                  rx="2"
                   stroke="#3B82F6"
                   strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                />
+                <rect
+                  x="13"
+                  y="13"
+                  width="8"
+                  height="8"
+                  rx="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
                 />
               </svg>
 
               <ListItemContent>
                 <div className="text-[14px] font-[500] text-black">
-                  Hyzmatlar
+                  Kategoriýalar
                 </div>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
-              selected={path.pathname.includes("/works")}
-              onClick={() => history.push({ pathname: "/works" })}
+              selected={path.pathname.includes("/attribute")}
+              onClick={() => history.push({ pathname: "/attribute" })}
             >
               <svg
                 width="24"
@@ -301,26 +390,126 @@ export default function Sidebar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M8 9H16M8 12H16M8 15H16"
+                <line
+                  x1="4"
+                  y1="6"
+                  x2="20"
+                  y2="6"
                   stroke="#3B82F6"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
+                <circle cx="12" cy="6" r="2" stroke="#3B82F6" strokeWidth="2" />
+
+                <line
+                  x1="4"
+                  y1="12"
+                  x2="20"
+                  y2="12"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <circle
+                  cx="16"
+                  cy="12"
+                  r="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+
+                <line
+                  x1="4"
+                  y1="18"
+                  x2="20"
+                  y2="18"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <circle cx="8" cy="18" r="2" stroke="#3B82F6" strokeWidth="2" />
               </svg>
 
               <ListItemContent>
-                <div className="text-[14px] font-[500] text-black">Işler</div>
+                <div className="text-[14px] font-[500] text-black">
+                  Attributes
+                </div>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
+          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
+              selected={path.pathname.includes("/brands")}
+              onClick={() => history.push({ pathname: "/brands" })}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polygon
+                  points="3,2 17,2 21,6 7,20 3,20"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+                <circle
+                  cx="18"
+                  cy="5"
+                  r="1.5"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Markalar
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
+              selected={path.pathname.includes("/business-type")}
+              onClick={() => history.push({ pathname: "/business-type" })}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polygon
+                  points="3,2 17,2 21,6 7,20 3,20"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+                <circle
+                  cx="18"
+                  cy="5"
+                  r="1.5"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Business Types
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
               onClick={() => history.push({ pathname: "/banner" })}
@@ -352,7 +541,9 @@ export default function Sidebar() {
               </svg>
 
               <ListItemContent>
-                <div className="text-[14px] font-[500] text-black">Banner</div>
+                <div className="text-[14px] font-[500] text-black">
+                  Bannerler
+                </div>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
@@ -395,7 +586,7 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
 
-          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+          {/* <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
               onClick={() => history.push({ pathname: "/admins" })}
               selected={path?.pathname.includes("/admins")}
@@ -431,7 +622,7 @@ export default function Sidebar() {
                 </div>
               </ListItemContent>
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
 
           <ListItem>
             <ListItemButton onClick={() => setOpenModal(true)}>
