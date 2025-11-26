@@ -35,6 +35,9 @@ import {
   BusinessTypes,
   CreateBusinessTypes,
   UpdateBusinessTypes,
+  Requests,
+  RequestsUpdate,
+  Vendors
 } from "../pages/lazy";
 
 import ScrollIntoView from "./ScrollIntoView";
@@ -81,6 +84,20 @@ const App = () => {
               restricted={true}
               component={ProductsUpdate}
               path="/products/:id"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={Requests}
+              path="/requests"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={RequestsUpdate}
+              path="/requests/:id"
               exact
             />
 
@@ -272,6 +289,13 @@ const App = () => {
               restricted={true}
               component={AdminsUpdate}
               path="/admins/:id"
+              exact
+            />
+
+            <PrivateRoute
+              restricted={true}
+              component={Vendors}
+              path="/vendors"
               exact
             />
 

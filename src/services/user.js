@@ -91,6 +91,23 @@ export const userApi = createApi({
       }),
       invalidatesTags: [{ type: "User", id: "LIST" }],
     }),
+
+    // 🔹 Get vendors (admins only)
+    getVendors: builder.query({
+      query: () => `api/users/vendors`,
+      transformResponse: (response) => ({
+        vendors: Array.isArray(response)
+          ? response
+          : response.vendors || response,
+      }),
+      providesTags: (result) =>
+        result && result.vendors
+          ? [
+              ...result.vendors.map((v) => ({ type: "User", id: v.id })),
+              { type: "User", id: "VENDORS" },
+            ]
+          : [{ type: "User", id: "VENDORS" }],
+    }),
   }),
 });
 
@@ -101,4 +118,5 @@ export const {
   useUpdateUserMutation,
   useUpdateUserRoleMutation,
   useDeleteUserMutation,
+  useGetVendorsQuery
 } = userApi;

@@ -55,4 +55,8 @@ export const Shops = lazy(() => import("./shops/Shops"));
 export const ShopsUpdate = lazy(() => import("./shops/shopsUpdate"));
 export const ShopsCreate = lazy(() => import("./shops/shopsCreate"));
 
+export const Requests = lazy(() => import("./request/Requests"));
+export const RequestsUpdate = lazy(() => import("./request/RequestsUpdate"));
+export const Vendors = lazy(() => import("./vendors/Vendors"));
+
 export const Users = lazy(() => import("./users/Users"));

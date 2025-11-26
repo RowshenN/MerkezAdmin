@@ -161,6 +161,89 @@ export default function Sidebar() {
 
           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
             <ListItemButton
+              onClick={() => history.push({ pathname: "/vendors" })}
+              selected={path.pathname.includes("/vendors")}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="12" cy="7" r="4" stroke="#3B82F6" strokeWidth="2" />
+                <path
+                  d="M4 21C4 17 8 14 12 14C16 14 20 17 20 21"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <circle cx="6" cy="10" r="2" stroke="#3B82F6" strokeWidth="2" />
+                <circle
+                  cx="18"
+                  cy="10"
+                  r="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Vendors
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+           <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
+              onClick={() => history.push({ pathname: "/requests" })}
+              selected={path.pathname.includes("/requests")}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 8H21L19 4H5L3 8Z"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect
+                  x="4"
+                  y="8"
+                  width="16"
+                  height="12"
+                  rx="2"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="10"
+                  y="14"
+                  width="4"
+                  height="6"
+                  rx="1"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                />
+              </svg>
+
+              <ListItemContent>
+                <div className="text-[14px] font-[500] text-black">
+                  Requests to create
+                </div>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem className="h-[50px] hover:bg-[#3B82F6]">
+            <ListItemButton
               onClick={() => history.push({ pathname: "/shops" })}
               selected={path.pathname.includes("/shops")}
             >

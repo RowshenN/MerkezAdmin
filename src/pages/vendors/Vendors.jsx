@@ -1,24 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Select, { selectClasses } from "@mui/joy/Select";
-import Option from "@mui/joy/Option";
 import Button from "@mui/joy/Button";
 import Modal from "@mui/joy/Modal";
 import Sheet from "@mui/joy/Sheet";
-import { KeyboardArrowDown } from "@mui/icons-material";
 import Pagination from "../../components/pagination";
 import PageLoading from "../../components/PageLoading";
 import dayjs from "dayjs";
 import { DatePicker } from "antd";
 import { useHistory } from "react-router-dom";
 
-import { useGetUsersQuery, useDeleteUserMutation } from "../../services/user";
+import { useGetVendorsQuery, useDeleteUserMutation } from "../../services/user";
 
-import {
-  useBlockUserMutation,
-  useUnblockUserMutation,
-} from "../../services/blockedUser";
-
-const Users = () => {
+const Vendors = () => {
   const history = useHistory();
   const { RangePicker } = DatePicker;
 
@@ -32,15 +24,13 @@ const Users = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [pages, setPages] = useState([]);
 
-  const { data: rawUsers, isLoading, refetch } = useGetUsersQuery(filter);
+  const { data: rawVendors, isLoading, refetch } = useGetVendorsQuery(filter);
 
-  const [deleteUser] = useDeleteUserMutation();
-  const [blockUser] = useBlockUserMutation();
-  const [unblockUser] = useUnblockUserMutation();
+  const [deleteVendor] = useDeleteUserMutation();
 
-  const users = Array.isArray(rawUsers?.users)
-    ? rawUsers.users
-    : rawUsers || [];
+  const vendors = Array.isArray(rawVendors?.vendors)
+    ? rawVendors.vendors
+    : rawVendors || [];
 
   // Debounce search
   useEffect(() => {
@@ -52,16 +42,16 @@ const Users = () => {
 
   // Pagination pages
   useEffect(() => {
-    if (users?.length) {
-      const totalPages = Math.ceil(users.length / filter.limit);
+    if (vendors?.length) {
+      const totalPages = Math.ceil(vendors.length / filter.limit);
       setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
     }
-  }, [users, filter.limit]);
+  }, [vendors, filter.limit]);
 
   const handleDelete = async () => {
     if (selectedId) {
       try {
-        await deleteUser(selectedId).unwrap();
+        await deleteVendor(selectedId).unwrap();
         setIsDelete(false);
         setSelectedId(null);
         refetch();
@@ -71,31 +61,13 @@ const Users = () => {
     }
   };
 
-  const handleBlockToggle = async (user) => {
-    try {
-      if (user.isBlocked) {
-        await unblockUser(user.phoneNumber).unwrap();
-      } else {
-        await blockUser({
-          phoneNumber: user.phoneNumber,
-          reason: "Blocked by admin",
-        }).unwrap();
-      }
-      refetch();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  console.log("users:  ", users);
-
   if (isLoading) return <PageLoading />;
 
   return (
     <div className="w-full">
       {/* Header */}
       <div className="w-full pb-[15px] flex justify-between items-center">
-        <h1 className="text-[30px] font-[700]">Ulanyjylar</h1>
+        <h1 className="text-[30px] font-[700]">Satyjylar</h1>
         <div className="w-fit flex gap-5">
           <RangePicker
             value={[dayjs().subtract(1, "day"), dayjs()]}
@@ -106,6 +78,7 @@ const Users = () => {
 
       {/* Table */}
       <div className="w-full p-5 bg-white rounded-[8px]">
+
         {/* Search */}
         <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
           <input
@@ -119,55 +92,49 @@ const Users = () => {
 
         {/* Table Header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
             Ady
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
             Familyasy
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
             Telefon
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[15%] uppercase">
-            Role
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
+            Isinin gornusi
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase text-center">
             Hereketler
           </h1>
         </div>
 
         {/* Table Body */}
         <div className="w-full flex flex-wrap">
-          {users.map((user) => (
+          {vendors.map((vendor) => (
             <div
-              key={user.id}
+              key={vendor.id}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
-              <h1 className="text-[14px] font-[500] text-black w-[20%]">
-                {user.name}
+              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+                {vendor.name}
               </h1>
               <h1 className="text-[14px] font-[500] text-black w-[25%]">
-                {user.surname || "-"}
+                {vendor.surname || "-"}
               </h1>
-              <h1 className="text-[14px] font-[500] text-black w-[20%]">
-                {user.phoneNumber}
+              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+                {vendor.phoneNumber}
               </h1>
-              <h1 className="text-[14px] font-[500] text-black w-[15%]">
-                {user.role}
+              <h1 className="text-[14px] font-[500] text-black w-[25%]">
+                {vendor?.businessType?.name || "-"}
               </h1>
-              <div className="flex items-center justify-center gap-3 w-[20%]">
-                <Button
-                  size="sm"
-                  color={user.isBlocked ? "success" : "danger"}
-                  onClick={() => handleBlockToggle(user)}
-                >
-                  {user.isBlocked ? "Unblock" : "Block"}
-                </Button>
+
+              <div className="flex items-center justify-center gap-3 w-[25%]">
                 <Button
                   size="sm"
                   onClick={() => {
                     setIsDelete(true);
-                    setSelectedId(user.id);
+                    setSelectedId(vendor.id);
                   }}
                   className="!bg-white !rounded-[6px] !px-2 !py-1"
                 >
@@ -189,14 +156,14 @@ const Users = () => {
 
         {/* Pagination */}
         <div className="w-full bg-white p-4 rounded-[8px] flex mt-5 justify-between items-center">
-          <h1 className="text-[14px] font-[400]">{users.length} Ulanyjylar</h1>
+          <h1 className="text-[14px] font-[400]">{vendors.length} Satyjylar</h1>
           <Pagination
             meta={{
               page: filter.page,
-              totalPages: Math.ceil(users.length / filter.limit),
+              totalPages: Math.ceil(vendors.length / filter.limit),
             }}
             pages={pages}
-            length={users.length}
+            length={vendors.length}
             pageNo={filter.page}
             next={() => setFilter({ ...filter, page: filter.page + 1 })}
             prev={() => setFilter({ ...filter, page: filter.page - 1 })}
@@ -218,7 +185,7 @@ const Users = () => {
             sx={{ maxWidth: 500, borderRadius: "md", p: 3, boxShadow: "lg" }}
           >
             <div className="flex w-[350px] border-b-[1px] border-[#E9EBF0] pb-5 justify-between items-center">
-              <h1 className="text-[20px] font-[500]">Ulanyjyny pozmak</h1>
+              <h1 className="text-[20px] font-[500]">Satyjyny pozmak</h1>
               <button onClick={() => setIsDelete(false)}>
                 <svg
                   width="16"
@@ -239,7 +206,7 @@ const Users = () => {
 
             <div>
               <h1 className="text-[16px] text-center my-10 font-[400]">
-                Ulanyjyny pozmak isleýärsiňizmi?
+                Satyjyny pozmak isleýärsiňizmi?
               </h1>
               <div className="flex gap-[29px] justify-center">
                 <button
@@ -263,4 +230,4 @@ const Users = () => {
   );
 };
 
-export default React.memo(Users);
+export default React.memo(Vendors);

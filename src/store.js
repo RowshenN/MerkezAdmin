@@ -12,6 +12,9 @@ import { categoryApi } from "./services/category";
 import { subscribesApi } from "./services/subscribes";
 import { productApi } from "./services/product";
 import { businessTypeApi } from "./services/businessTypes";
+import { requestApi } from "./services/request";
+import { blockedUserApi } from "./services/blockedUser";
+import { userApi } from "./services/user";
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +30,9 @@ export const store = configureStore({
     [shopApi.reducerPath]: shopApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [subscribesApi.reducerPath]: subscribesApi.reducer,
+    [requestApi.reducerPath]: requestApi.reducer,
+    [blockedUserApi.reducerPath]: blockedUserApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -41,6 +47,9 @@ export const store = configureStore({
       aboutApi.middleware,
       shopApi.middleware,
       categoryApi.middleware,
-      subscribesApi.middleware
+      subscribesApi.middleware,
+      requestApi.middleware,
+      blockedUserApi.middleware,
+      userApi.middleware
     ),
 });
