@@ -148,7 +148,7 @@ const Requests = () => {
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[3%] uppercase">
             ID
           </h1>
-           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[5%] uppercase">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[5%] uppercase">
             UserId
           </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[10%] uppercase">
@@ -175,8 +175,11 @@ const Requests = () => {
         {Array.isArray(requestsData) && requestsData.length > 0 ? (
           requestsData.map((req, i) => (
             <div
+              onDoubleClick={() =>
+                history.push({ pathname: path?.pathname + "/" + req?.id })
+              }
               key={"req" + i}
-              className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
+              className="w-full cursor-pointer gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
               <h1 className="text-[14px] font-[500] text-black w-[3%]">
                 {req?.id}

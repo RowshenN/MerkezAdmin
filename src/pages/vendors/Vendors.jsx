@@ -6,13 +6,18 @@ import Pagination from "../../components/pagination";
 import PageLoading from "../../components/PageLoading";
 import dayjs from "dayjs";
 import { DatePicker } from "antd";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
-import { useGetVendorsQuery, useDeleteUserMutation } from "../../services/user";
+// ✅ UPDATED: import vendor API instead of user API
+import {
+  useGetVendorsQuery,
+  useDeleteVendorMutation,
+} from "../../services/vendors";
 
 const Vendors = () => {
   const history = useHistory();
   const { RangePicker } = DatePicker;
+  const path = useLocation();
 
   const [filter, setFilter] = useState({
     page: 1,
@@ -24,9 +29,11 @@ const Vendors = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [pages, setPages] = useState([]);
 
+  // ✅ UPDATED: getVendors from vendorApi
   const { data: rawVendors, isLoading, refetch } = useGetVendorsQuery(filter);
 
-  const [deleteVendor] = useDeleteUserMutation();
+  // ✅ UPDATED: deleteVendor instead of deleteUser
+  const [deleteVendor] = useDeleteVendorMutation();
 
   const vendors = Array.isArray(rawVendors?.vendors)
     ? rawVendors.vendors
@@ -78,7 +85,6 @@ const Vendors = () => {
 
       {/* Table */}
       <div className="w-full p-5 bg-white rounded-[8px]">
-
         {/* Search */}
         <div className="w-full mb-4 flex items-center px-4 h-[40px] rounded-[6px] border-[1px] border-[#E9EBF0]">
           <input
@@ -92,6 +98,9 @@ const Vendors = () => {
 
         {/* Table Header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
+          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[5%] uppercase">
+            ID
+          </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[25%] uppercase">
             Ady
           </h1>
@@ -116,6 +125,9 @@ const Vendors = () => {
               key={vendor.id}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
+              <h1 className="text-[14px] font-[500] text-black w-[5%]">
+                {vendor.id}
+              </h1>
               <h1 className="text-[14px] font-[500] text-black w-[25%]">
                 {vendor.name}
               </h1>
@@ -126,10 +138,40 @@ const Vendors = () => {
                 {vendor.phoneNumber}
               </h1>
               <h1 className="text-[14px] font-[500] text-black w-[25%]">
-                {vendor?.businessType?.name || "-"}
+                {vendor?.typeOfBusiness || "-"}
               </h1>
 
               <div className="flex items-center justify-center gap-3 w-[25%]">
+                <span
+                  className={`px-4 uppercase py-2 rounded-[12px] text-[13px] font-[600] ${
+                    vendor.status === "approved"
+                      ? "bg-[#44CE62] text-white"
+                      : vendor.status === "rejected" 
+                      ? "bg-[#E91F00] text-white"
+                      : "bg-yellow text-white"
+                  }`}
+                >
+                  {`${vendor.status}`}
+                </span>
+
+                <div
+                  onClick={() =>
+                    history.push({ pathname: `${path.pathname}/${vendor.id}` })
+                  }
+                  className="cursor-pointer p-2 hover:bg-gray-100 rounded-[6px]"
+                >
+                  <svg
+                    width="3"
+                    height="15"
+                    viewBox="0 0 3 15"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="1.5" cy="1.5" r="1.5" fill="black" />
+                    <circle cx="1.5" cy="7.5" r="1.5" fill="black" />
+                    <circle cx="1.5" cy="13.5" r="1.5" fill="black" />
+                  </svg>
+                </div>
                 <Button
                   size="sm"
                   onClick={() => {

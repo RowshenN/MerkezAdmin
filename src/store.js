@@ -15,6 +15,7 @@ import { businessTypeApi } from "./services/businessTypes";
 import { requestApi } from "./services/request";
 import { blockedUserApi } from "./services/blockedUser";
 import { userApi } from "./services/user";
+import { vendorApi } from "./services/vendors";
 
 export const store = configureStore({
   reducer: {
@@ -33,6 +34,7 @@ export const store = configureStore({
     [requestApi.reducerPath]: requestApi.reducer,
     [blockedUserApi.reducerPath]: blockedUserApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [vendorApi.reducerPath]: vendorApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -50,6 +52,7 @@ export const store = configureStore({
       subscribesApi.middleware,
       requestApi.middleware,
       blockedUserApi.middleware,
-      userApi.middleware
+      userApi.middleware,
+      vendorApi.middleware,
     ),
 });

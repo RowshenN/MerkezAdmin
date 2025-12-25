@@ -87,8 +87,6 @@ const Users = () => {
     }
   };
 
-  console.log("users:  ", users);
-
   if (isLoading) return <PageLoading />;
 
   return (
@@ -119,6 +117,9 @@ const Users = () => {
 
         {/* Table Header */}
         <div className="w-full gap-[20px] flex items-center px-4 h-[40px] rounded-[6px] bg-[#F7F8FA]">
+        <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[5%] uppercase">
+            Id
+          </h1>
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] uppercase">
             Ady
           </h1>
@@ -131,7 +132,7 @@ const Users = () => {
           <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[15%] uppercase">
             Role
           </h1>
-          <h1 className="text-[14px] font-[500] text-[#98A2B2] w-[20%] uppercase">
+          <h1 className="text-[14px]  text-center font-[500] text-[#98A2B2] w-[20%] uppercase">
             Hereketler
           </h1>
         </div>
@@ -143,6 +144,9 @@ const Users = () => {
               key={user.id}
               className="w-full gap-[20px] flex items-center px-4 h-[70px] rounded-[6px] bg-white border-b-[1px] border-[#E9EBF0]"
             >
+              <h1 className="text-[14px] font-[500] text-black w-[5%]">
+                {user.id}
+              </h1>
               <h1 className="text-[14px] font-[500] text-black w-[20%]">
                 {user.name}
               </h1>

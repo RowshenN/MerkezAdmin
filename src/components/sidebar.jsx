@@ -13,6 +13,7 @@ import Sheet from "@mui/joy/Sheet";
 import { logout } from "../utils/index";
 
 import userDefault from "../images/user.png";
+import { Person2Outlined } from "@mui/icons-material";
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
   const [open, setOpen] = React.useState(defaultExpanded);
@@ -93,7 +94,8 @@ export default function Sidebar() {
           />
         </div> */}
         <div className="flex gap-1 flex-wrap w-full">
-          <div className="text-[14px] w-full font-[500]">
+          <div className="text-[14px] flex flex-col items-center justify-center gap-1 w-full font-[500]">
+            <Person2Outlined />
             {user?.user?.name != null ? user?.user?.name : ""}
           </div>
         </div>
