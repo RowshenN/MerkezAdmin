@@ -82,6 +82,9 @@ const Shops = () => {
     }
   };
 
+  console.log("shop adminpnel:  ", shopsData);
+  
+
   if (isLoading) return <PageLoading />;
 
   return (

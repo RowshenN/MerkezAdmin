@@ -22,7 +22,7 @@ export const shopApi = createApi({
       providesTags: ["Shop"],
     }),
 
-    // 🔹 2. Public — get all active shops (homepage) with pagination
+    // 🔹 1. Superadmin — get all shops
     getAllShopsPublic: builder.query({
       query: (params = {}) => {
         const query = new URLSearchParams(params).toString();

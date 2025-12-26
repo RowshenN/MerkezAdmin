@@ -42,7 +42,7 @@ const ProductCreate = () => {
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
   const user = JSON.parse(localStorage.getItem("userData")) || {};
-  const isSuperAdmin = user?.user.role === "superadmin";
+  const isSuperAdmin = user?.user?.role === "superadmin";
 
   // Fetch categories
   const { data: categoryTree } = useGetCategoryTreeQuery();
